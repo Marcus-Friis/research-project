@@ -61,6 +61,19 @@ class ArxivScraper:
         response = requests.get(api_url)
         return response.text
         
+    @staticmethod
+    def _retry(func):
+        def wrapper(*args, **kwargs):
+            for interval in [5, 10, 20, 60]:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    time.sleep(interval)
+                    continue
+            raise e
+        return wrapper
+        
+    @_retry
     def _visit_article(self, arxiv_id: str) -> str:
         metadata = self._get_metadata(arxiv_id)
         body = self._get_body(arxiv_id)
