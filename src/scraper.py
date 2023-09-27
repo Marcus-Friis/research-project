@@ -40,11 +40,9 @@ def _init_json():
     if os.path.isfile(ARXIV_JSON_FILENAME):
         with open(ARXIV_JSON_FILENAME, 'r') as f:
             return json.load(f)
-    
-    data = {}
-    with open(ARXIV_JSON_FILENAME, 'w') as f:
-        json.dump(data, f, indent=4)
-    return data
+
+    reset_cache()
+    return {}
 
 def _get_body(arxiv_id: str) -> str:
     url = f'https://arxiv.org/pdf/hep-ph/{arxiv_id}.pdf'
@@ -104,7 +102,7 @@ def _visit_article(arxiv_id: str) -> str:
     }
     return data
 
-def wipe_cache():
+def reset_cache():
     with open(ARXIV_JSON_FILENAME, 'w') as f:
         json.dump({}, f, indent=4)
 
