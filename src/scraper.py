@@ -4,7 +4,7 @@ import PyPDF2
 import time
 import json
 import os
-
+import xml.etree.ElementTree as ET
 
 class PDFToStringConverter:
     def __init__(self, pdf_url):
@@ -51,10 +51,37 @@ def _get_body(arxiv_id: str) -> str:
     pdf = PDFToStringConverter(url)
     return pdf.convert_to_string()
 
+
+def _parse_arx_xml(root):
+    element = ET.fromstring(root)
+    result = {}
+    for child in element:
+        tag = child.tag.split('}')[-1]
+        child_dict = _parse_arx_xml(child)
+
+        if tag in result:
+            if isinstance(result[tag], list):
+                result[tag].append(child_dict)
+            else:
+                result[tag] = [result[tag], child_dict]
+        else:
+            result[tag] = child_dict
+
+    # Handle the case where the element has no sub-elements and contains attributes
+    if not result:
+        if element.text:
+            return element.text
+        elif element.attrib:
+            return element.attrib
+        else:
+            return None
+
+    return result
+
 def _get_metadata(arxiv_id: str) -> str:
     api_url = f'https://export.arxiv.org/api/query?id_list=hep-ph/{arxiv_id}&max_results=1'
     response = requests.get(api_url)
-    return response.text
+#    return _parse_arx_xml(response.text)
 
 def _retry(func):
     def wrapper(*args, **kwargs):
@@ -67,7 +94,7 @@ def _retry(func):
         raise e
     return wrapper
 
-@_retry
+#@_retry
 def _visit_article(arxiv_id: str) -> str:
     metadata = _get_metadata(arxiv_id)
     body = _get_body(arxiv_id)
@@ -91,6 +118,10 @@ def scrape(arxiv_list: list, sleep_interval: int = 15) -> dict:
                 json.dump(data, f, indent=4)
             time.sleep(sleep_interval)
     return data
+
+
+
+
 
 
 if __name__ == '__main__':
