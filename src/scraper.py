@@ -34,76 +34,68 @@ class PDFToStringConverter:
             raise Exception(f"Failed to convert PDF to text: {e}")
 
 
-class ArxivScraper:
-    filename = 'arxiv.json'
-    
-    def _init_json(self):
-        if os.path.isfile(self.filename):
-            with open(self.filename, 'r') as f:
-                return json.load(f)
-        
-        data = {}
-        j = json.dumps(data, indent=4)
-        with open(self.filename, 'w') as f:
-            f.write(j)
-        return data
-    
-    def __init__(self) -> None:
-        self.data = self._init_json()    
-    
-    def _get_body(self, arxiv_id: str) -> str:
-        url = f'https://arxiv.org/pdf/hep-ph/{arxiv_id}.pdf'
-        pdf = PDFToStringConverter(url)
-        return pdf.convert_to_string()
-    
-    def _get_metadata(self, arxiv_id: str) -> str:
-        api_url = f'https://export.arxiv.org/api/query?id_list=hep-ph/{arxiv_id}&max_results=1'
-        response = requests.get(api_url)
-        return response.text
-        
-    @staticmethod
-    def _retry(func):
-        def wrapper(*args, **kwargs):
-            for interval in [5, 10, 20, 60]:
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    time.sleep(interval)
-                    continue
-            raise e
-        return wrapper
-        
-    @_retry
-    def _visit_article(self, arxiv_id: str) -> str:
-        metadata = self._get_metadata(arxiv_id)
-        body = self._get_body(arxiv_id)
-        data = {
-            'metadata': metadata,
-            'body': body
-        }
-        return data
-    
-    def wipe_chache(self):
-        with open(self.filename, 'w') as f:
-            json.dump({}, f)
-        self.data = {}
+ARXIV_JSON_FILENAME = 'arxiv.json'
 
-    def scrape(self, arxiv_list: list, sleep_interval: int = 15) -> dict:
-        for arxiv_id in arxiv_list:
-            if arxiv_id not in self.data.keys():
-                arxiv_content = self._visit_article(arxiv_id)
-                self.data[arxiv_id] = arxiv_content
-                j = json.dumps(self.data, indent=4)
-                with open(self.filename, 'w') as f:
-                    f.write(j)
-                time.sleep(sleep_interval)
-        return self.data
+def _init_json():
+    if os.path.isfile(ARXIV_JSON_FILENAME):
+        with open(ARXIV_JSON_FILENAME, 'r') as f:
+            return json.load(f)
+    
+    data = {}
+    with open(ARXIV_JSON_FILENAME, 'w') as f:
+        json.dump(data, f, indent=4)
+    return data
+
+def _get_body(arxiv_id: str) -> str:
+    url = f'https://arxiv.org/pdf/hep-ph/{arxiv_id}.pdf'
+    pdf = PDFToStringConverter(url)
+    return pdf.convert_to_string()
+
+def _get_metadata(arxiv_id: str) -> str:
+    api_url = f'https://export.arxiv.org/api/query?id_list=hep-ph/{arxiv_id}&max_results=1'
+    response = requests.get(api_url)
+    return response.text
+
+def _retry(func):
+    def wrapper(*args, **kwargs):
+        for interval in [5, 10, 20, 60]:
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                time.sleep(interval)
+                continue
+        raise e
+    return wrapper
+
+@_retry
+def _visit_article(arxiv_id: str) -> str:
+    metadata = _get_metadata(arxiv_id)
+    body = _get_body(arxiv_id)
+    data = {
+        'metadata': metadata,
+        'body': body
+    }
+    return data
+
+def wipe_cache():
+    with open(ARXIV_JSON_FILENAME, 'w') as f:
+        json.dump({}, f, indent=4)
+
+def scrape(arxiv_list: list, sleep_interval: int = 15) -> dict:
+    data = _init_json()
+    for arxiv_id in arxiv_list:
+        if arxiv_id not in data:
+            arxiv_content = _visit_article(arxiv_id)
+            data[arxiv_id] = arxiv_content
+            with open(ARXIV_JSON_FILENAME, 'w') as f:
+                json.dump(data, f, indent=4)
+            time.sleep(sleep_interval)
+    return data
 
 
 if __name__ == '__main__':
     arxiv_list = ['0203079']
-    arx = ArxivScraper()
-    print(arx._visit_article(arxiv_list[0]))
+    print(_visit_article(arxiv_list[0]))
 
 
     ## OFFICIAL ARXIV API STUFF
