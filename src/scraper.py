@@ -5,6 +5,7 @@ import time
 import json
 import os
 import xml.etree.ElementTree as ET
+from tqdm import tqdm
 
 class PDFToStringConverter:
     def __init__(self, pdf_url):
@@ -23,7 +24,6 @@ class PDFToStringConverter:
     def convert_to_string(self):
         pdf_file = self.download_pdf()
         pdf_text = ""
-        
         try:
             reader = PyPDF2.PdfReader(pdf_file)
             for page_num in range(len(reader.pages)):
@@ -31,7 +31,9 @@ class PDFToStringConverter:
                 pdf_text += page.extract_text()
             return pdf_text
         except Exception as e:
-            raise Exception(f"Failed to convert PDF to text: {e}")
+            # raise Exception(f"Failed to convert PDF to text: {e}")
+            print(f"Failed to convert PDF to text: {e}")
+            return f"Failed to convert PDF to text: {e}"
 
 
 ARXIV_JSON_FILENAME = 'arxiv.json'
@@ -50,12 +52,12 @@ def _get_body(arxiv_id: str) -> str:
     return pdf.convert_to_string()
 
 
-def _parse_arx_xml(root):
-    element = ET.fromstring(root)
+def _parse_arx_xml(xml):
+    element = ET.fromstring(xml)
     result = {}
     for child in element:
         tag = child.tag.split('}')[-1]
-        child_dict = _parse_arx_xml(child)
+        child_dict = _parse_arx_xml(ET.tostring(child, encoding='utf-8').decode('utf-8'))
 
         if tag in result:
             if isinstance(result[tag], list):
@@ -79,7 +81,10 @@ def _parse_arx_xml(root):
 def _get_metadata(arxiv_id: str) -> str:
     api_url = f'https://export.arxiv.org/api/query?id_list=hep-ph/{arxiv_id}&max_results=1'
     response = requests.get(api_url)
-#    return _parse_arx_xml(response.text)
+    if response.status_code == 200:
+        return _parse_arx_xml(response.text)
+    else:
+        return None  # Handle the case where the request fails
 
 def _retry(func):
     def wrapper(*args, **kwargs):
@@ -87,12 +92,14 @@ def _retry(func):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
+                error = e
+                print(f'Error {e} occured, retrying in {interval} seconds.')
                 time.sleep(interval)
                 continue
-        raise e
+        raise error
     return wrapper
 
-#@_retry
+# @_retry
 def _visit_article(arxiv_id: str) -> str:
     metadata = _get_metadata(arxiv_id)
     body = _get_body(arxiv_id)
@@ -102,24 +109,26 @@ def _visit_article(arxiv_id: str) -> str:
     }
     return data
 
+def _pad_id(arxiv_id: str) -> str:
+    id_length = 7
+    n = len(arxiv_id)
+    return '0'*(id_length - n) + arxiv_id
+
 def reset_cache():
     with open(ARXIV_JSON_FILENAME, 'w') as f:
         json.dump({}, f, indent=4)
 
 def scrape(arxiv_list: list, sleep_interval: int = 15) -> dict:
     data = _init_json()
-    for arxiv_id in arxiv_list:
+    for arxiv_id in tqdm(arxiv_list):
         if arxiv_id not in data:
-            arxiv_content = _visit_article(arxiv_id)
+            padded_id = _pad_id(arxiv_id)
+            arxiv_content = _visit_article(padded_id)
             data[arxiv_id] = arxiv_content
             with open(ARXIV_JSON_FILENAME, 'w') as f:
                 json.dump(data, f, indent=4)
             time.sleep(sleep_interval)
     return data
-
-
-
-
 
 
 if __name__ == '__main__':
