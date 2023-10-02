@@ -31,9 +31,9 @@ class PDFToStringConverter:
                 pdf_text += page.extract_text()
             return pdf_text
         except Exception as e:
-            # raise Exception(f"Failed to convert PDF to text: {e}")
-            print(f"Failed to convert PDF to text: {e}")
-            return f"Failed to convert PDF to text: {e}"
+            raise Exception(f"Failed to convert PDF to text: {e}")
+            # print(f"Failed to convert PDF to text: {e}")
+            # return f"Failed to convert PDF to text: {e}"
 
 
 ARXIV_JSON_FILENAME = 'arxiv.json'
@@ -46,11 +46,14 @@ def _init_json():
     reset_cache()
     return {}
 
-def _get_body(arxiv_id: str) -> str:
+def _get_body_from_id(arxiv_id: str) -> str:
     url = f'https://arxiv.org/pdf/hep-ph/{arxiv_id}.pdf'
     pdf = PDFToStringConverter(url)
     return pdf.convert_to_string()
 
+def _get_body_from_url(url: str) -> str:
+    pdf = PDFToStringConverter(url)
+    return pdf.convert_to_string()
 
 def _parse_arx_xml(xml):
     element = ET.fromstring(xml)
@@ -102,7 +105,14 @@ def _retry(func):
 # @_retry
 def _visit_article(arxiv_id: str) -> str:
     metadata = _get_metadata(arxiv_id)
-    body = _get_body(arxiv_id)
+    if metadata is None:
+        raise Exception('Unable to get metadata')
+    
+    # extract version number from the api
+    pdf_url = metadata['entry']['id']
+    pdf_url = f'http://arxiv.org/pdf/hep-ph/{pdf_url.split("/")[-1]}.pdf'
+
+    body = _get_body_from_url(pdf_url)
     data = {
         'metadata': metadata,
         'body': body
