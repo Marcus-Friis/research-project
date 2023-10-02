@@ -7,6 +7,7 @@ import os
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
 
+
 class PDFToStringConverter:
     def __init__(self, pdf_url):
         self.pdf_url = pdf_url
@@ -144,10 +145,36 @@ def scrape(arxiv_list: list, sleep_interval: int = 15) -> dict:
                 continue
     return data
 
+def download_format(arxiv_id: str) -> None:
+    padded_arxiv_id = _pad_id(arxiv_id)
+    url = f'https://arxiv.org/e-print/hep-ph/{padded_arxiv_id}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(f'formats/tar/{arxiv_id}.tar', 'wb') as f:
+            f.write(response.content)
+    else:
+        raise Exception(f'API error, response code: {response.status_code}')
+
+def process_format(arxiv_id: str) -> None:
+    import tarfile
+    with tarfile.open(f'formats/tar/{arxiv_id}.tar') as tar:
+        tar.extractall(f'formats/papers/{arxiv_id}')
+
 
 if __name__ == '__main__':
-    arxiv_list = ['0203079']
-    print(_visit_article(arxiv_list[0]))
+    # arxiv_list = ['0203079']
+    # print(_visit_article(arxiv_list[0]))
+
+    # arxiv_id = '203079'
+    arxiv_list = [
+        '9704296',	'9606402'
+        ]
+    for arxiv_id in arxiv_list:
+        download_format(arxiv_id)
+        try:
+            process_format(arxiv_id)
+        except:
+            continue
 
 
     ## OFFICIAL ARXIV API STUFF
