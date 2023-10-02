@@ -87,8 +87,8 @@ def _get_metadata(arxiv_id: str) -> str:
     if response.status_code == 200:
         return _parse_arx_xml(response.text)
     else:
-        return None  # Handle the case where the request fails
-
+        raise Exception(f'API error, response code: {response.status_code}')
+    
 def _retry(func):
     def wrapper(*args, **kwargs):
         for interval in [5, 10, 20, 60]:
@@ -132,12 +132,16 @@ def scrape(arxiv_list: list, sleep_interval: int = 15) -> dict:
     data = _init_json()
     for arxiv_id in tqdm(arxiv_list):
         if arxiv_id not in data:
-            padded_id = _pad_id(arxiv_id)
-            arxiv_content = _visit_article(padded_id)
-            data[arxiv_id] = arxiv_content
-            with open(ARXIV_JSON_FILENAME, 'w') as f:
-                json.dump(data, f, indent=4)
-            time.sleep(sleep_interval)
+            try:
+                padded_id = _pad_id(arxiv_id)
+                arxiv_content = _visit_article(padded_id)
+                data[arxiv_id] = arxiv_content
+                with open(ARXIV_JSON_FILENAME, 'w') as f:
+                    json.dump(data, f, indent=4)
+                time.sleep(sleep_interval)
+            except Exception as e:
+                print(f'Article {padded_id}, encountered {e}')
+                continue
     return data
 
 
