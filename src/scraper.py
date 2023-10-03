@@ -109,14 +109,15 @@ def _visit_article(arxiv_id: str) -> str:
     if metadata is None:
         raise Exception('Unable to get metadata')
     
-    # extract version number from the api
-    pdf_url = metadata['entry']['id']
-    pdf_url = f'http://arxiv.org/pdf/hep-ph/{pdf_url.split("/")[-1]}.pdf'
+    # # extract version number from the api
+    # pdf_url = metadata['entry']['id']
+    # pdf_url = f'http://arxiv.org/pdf/hep-ph/{pdf_url.split("/")[-1]}.pdf'
 
-    body = _get_body_from_url(pdf_url)
+    # body = _get_body_from_url(pdf_url)
+
     data = {
         'metadata': metadata,
-        'body': body
+        # 'body': body
     }
     return data
 
@@ -166,9 +167,12 @@ if __name__ == '__main__':
     # print(_visit_article(arxiv_list[0]))
 
     # arxiv_id = '203079'
-    arxiv_list = [
-        '9704296',	'9606402'
-        ]
+    arxiv_list = ['9907233',
+                '9301253',
+                '9504304',
+                '9505235',
+                '9506257'
+                    ]
     for arxiv_id in arxiv_list:
         download_format(arxiv_id)
         try:
