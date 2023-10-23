@@ -37,7 +37,7 @@ class PDFToStringConverter:
             # return f"Failed to convert PDF to text: {e}"
 
 
-ARXIV_JSON_FILENAME = 'arxiv.json'
+ARXIV_JSON_FILENAME = '../data/arxiv.json'
 
 def _init_json():
     if os.path.isfile(ARXIV_JSON_FILENAME):
