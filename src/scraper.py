@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from tqdm import tqdm
 
 
+
 class PDFToStringConverter:
     def __init__(self, pdf_url):
         self.pdf_url = pdf_url
@@ -160,6 +161,53 @@ def process_format(arxiv_id: str) -> None:
     import tarfile
     with tarfile.open(f'formats/tar/{arxiv_id}.tar') as tar:
         tar.extractall(f'formats/papers/{arxiv_id}')
+
+
+
+def combine_json(directory):
+    combined_data = {}
+    total_keys = 0
+    seen_keys = set()  # Set to keep track of keys we've already seen
+
+    # Iterate through each file in the directory
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+
+        if os.path.isfile(file_path) and filename.endswith(".json"):
+            try:
+                with open(file_path, "r") as file:
+                    data = json.load(file)
+
+                    if isinstance(data, dict):
+                        for key in data.keys():
+                            if key not in seen_keys:
+                                seen_keys.add(key)
+                                total_keys += 1
+                        combined_data.update(data)
+                    else:
+                        print(f"Warning: {filename} does not contain a JSON object, skipping.")
+
+            except Exception as e:
+                print(f"Error reading {file_path}. Error: {e}")
+
+    output_file = "combined_data.json"
+
+    try:
+        with open(output_file, "w") as file:
+            json.dump(combined_data, file, indent=4)
+
+        combined_keys = len(combined_data.keys())
+        print(f"The total number of unique keys processed from individual files is {total_keys}.")
+        print(f"The number of keys in the combined_data is {combined_keys}.")
+
+        if total_keys == combined_keys:
+            print("The keys count matches between the individual files and the combined data!")
+        else:
+            print("Mismatch in the keys count between individual files and the combined data.")
+    except Exception as e:
+        print(f"Error writing to {output_file}. Error: {e}")
+
+
 
 
 if __name__ == '__main__':
