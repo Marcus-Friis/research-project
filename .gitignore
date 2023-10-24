@@ -7,6 +7,9 @@
 # ignore output of hpc runs
 *.out
 
+# ignore arxiv.json
+arxiv.json
+
 ############################
 ######### STANDARD #########
 ############################
