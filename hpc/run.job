@@ -10,14 +10,13 @@
 echo "Running on $(hostname):"
 
 # run this every time?
-echo "module load Python/3.9.6-GCCcore-11.2.0"
 module load Python/3.9.6-GCCcore-11.2.0
-echo "module load CMake/3.21.1-GCCcore-11.2.0"
 module load CMake/3.21.1-GCCcore-11.2.0
-echo "module load CUDA/11.7.0"
 module load CUDA/11.7.0
-echo "llama-cpp-python"
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=2 python3 -m pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
+
+#echo "pip install llama-cpp-python"
+#python3 -m pip install --upgrade
+#CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=2 python3 -m pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
 
 echo "running python script"
 python main.py
