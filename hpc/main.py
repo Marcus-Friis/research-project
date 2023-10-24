@@ -7,13 +7,9 @@ verbose = False
 llama = Llama(model_path=model_path, n_gpu_layers=n_gpu_layers, embedding=embedding, verbose=verbose)
 
 
-prompt = b'who is the most beautiful? Mads or Morten?'
+prompt = 'Q: who is the most beautiful? Mads or Morten? A:'
 
-print(llama.embed(prompt))
+output = llama(prompt)
 
-# tokens = llama.tokenize(prompt)
-# for token in llama.generate(tokens, top_k=40, top_p=0.95, temp=1.0, repeat_penalty=1.1):
-#      print(llama.detokenize([token]))
+print(output["choices"][0]["text"])
 
-# response = llama.generate(prompt)
-# print(response)
