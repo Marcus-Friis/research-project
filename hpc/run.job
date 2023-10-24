@@ -15,7 +15,7 @@ module load CMake/3.21.1-GCCcore-11.2.0
 module load CUDA/11.7.0
 
 #echo "pip install llama-cpp-python"
-#python3 -m pip install --upgrade
+#python3 -m pip install --upgrade pip
 #CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=2 python3 -m pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
 
 echo "running python script"
