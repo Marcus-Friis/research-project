@@ -4,6 +4,9 @@
 # ignore .gguf files
 *.gguf
 
+# ignore output of hpc runs
+*.out
+
 ############################
 ######### STANDARD #########
 ############################
