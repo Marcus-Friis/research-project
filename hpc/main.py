@@ -19,15 +19,17 @@ if 'embedding' not in df.columns:
 
 # generate embeddings
 a = time.time()
-for i, row in df.iterrows():
-    if row.embedding is not None:
-        continue
-    print('ITEM\t', i)
-    abstract = row.abstract
-    prompt = f'{abstract}'
-    embedding = llama.embed(prompt)
-    df.at[i, 'embedding'] = embedding
-    df.to_csv('../data/arxiv.csv')
+try:
+    for i, row in df.iterrows():
+        if pd.isna(row.embedding):
+            print('ITEM\t', i)
+            abstract = row.abstract
+            prompt = f'{abstract}'
+            embedding = llama.embed(prompt)
+            df.at[i, 'embedding'] = embedding
+            df.to_csv('../data/arxiv2.csv')
+except:
+    df.to_csv('../data/arxiv2.csv')
 
 b = time.time()
 
