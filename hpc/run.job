@@ -3,9 +3,9 @@
 #SBATCH --job-name=llm-test      # Job name
 #SBATCH --output=output.out      # Name of output file (%j expands to jobId)
 #SBATCH --cpus-per-task=1        # Schedule one core
-#SBATCH --time=00:10:00          # Run time (hh:mm:ss) - run for one hour max
+#SBATCH --time=01:00:00          # Run time (hh:mm:ss) - run for one hour max
 #SBATCH --partition=brown        # Run on either the Red or Brown queue
-#SBATCH --gres=gpu       	 # If you are using CUDA dependent package
+#SBATCH --gres=gpu       	     # If you are using CUDA dependent package
 
 echo "Running on $(hostname):"
 
@@ -19,4 +19,4 @@ module load CUDA/11.7.0
 #CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=2 python3 -m pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
 
 echo "running python script"
-python main.py
+python3 -u main.py

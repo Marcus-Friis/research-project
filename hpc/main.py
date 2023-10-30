@@ -1,49 +1,34 @@
 from llama_cpp import Llama
 import json
+import time
+import pandas as pd
 
 # prepare model
 model_path = 'openbuddy-llama2-13b-v11.1.Q5_K_M.gguf'
 n_gpu_layers = -1
 embedding = True
 verbose = False
-llama = Llama(model_path=model_path, n_gpu_layers=n_gpu_layers, embedding=embedding, verbose=verbose)
-
-# # define prompt
-# prompt = 'Q: who is the most beautiful? Mads or Morten? A:'
-
-# # generate text
-# output = llama(prompt)
-# print(output)
-
-# # generate embedding
-# embedding = llama.embed(prompt)
-# print(embedding)
+n_ctx = 1024
+n_batch = 1024
+llama = Llama(model_path=model_path, n_gpu_layers=n_gpu_layers, embedding=embedding, verbose=verbose, n_ctx=n_ctx, n_batch=n_batch)
 
 # open arxiv data
-with open('../data/arxiv.json') as f:
-    data = json.load(f)
+df = pd.read_csv('../data/arxiv.csv')
+if 'embedding' not in df.columns:
+    df['embedding'] = None
 
 # generate embeddings
-lol = {}
-import time
 a = time.time()
-for i, (key, val) in enumerate(data.items()):
-    print(f'ITEM\t{i}')
-    abstract = val['metadata']['entry']['summary']
+for i, row in df.iterrows():
+    if row.embedding is not None:
+        continue
+    print('ITEM\t', i)
+    abstract = row.abstract
     prompt = f'{abstract}'
-    #output = llama(prompt)
-    val['embedding'] = llama.embed(prompt)   
-    lol[key] = val
-
-    with open('lol.json', 'w') as f:
-        json.dump(lol, f, indent=4)
-    
-    if i == 10:
-        break
+    embedding = llama.embed(prompt)
+    df.at[i, 'embedding'] = embedding
+    df.to_csv('../data/arxiv.csv')
 
 b = time.time()
 
 print('EXECUTED IN', b-a)
-
-
-
