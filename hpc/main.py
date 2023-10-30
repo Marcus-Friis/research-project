@@ -28,11 +28,16 @@ lol = {}
 import time
 a = time.time()
 for i, (key, val) in enumerate(data.items()):
+    print(f'ITEM\t{i}')
     abstract = val['metadata']['entry']['summary']
     prompt = f'{abstract}'
     #output = llama(prompt)
     val['embedding'] = llama.embed(prompt)   
     lol[key] = val
+
+    with open('lol.json', 'w') as f:
+        json.dump(lol, f, indent=4)
+    
     if i == 10:
         break
 
@@ -40,6 +45,5 @@ b = time.time()
 
 print('EXECUTED IN', b-a)
 
-with open('lol.json', 'w') as f:
-    json.dump(lol, f, indent=4)
+
 
