@@ -14,22 +14,34 @@ llama = Llama(model_path=model_path, n_gpu_layers=n_gpu_layers, embedding=embedd
 
 # open arxiv data
 df = pd.read_csv('../data/arxiv.csv')
-if 'embedding' not in df.columns:
-    df['embedding'] = None
+
+# embeds-json
+try:
+    with open('embeds.json', 'r') as f:
+        embeds = json.load(f)
+except FileNotFoundError:
+    print('NO FILE FOUND, CREATING NEW')
+    with open('embeds.json', 'w') as f:
+        embeds = {}
+        json.dump(embeds, f, indent=4)
 
 # generate embeddings
 a = time.time()
 try:
     for i, row in df.iterrows():
-        if pd.isna(row.embedding):
+        if row.id not in embeds:
             print('ITEM\t', i)
+            article_id = row.id
             abstract = row.abstract
             prompt = f'{abstract}'
             embedding = llama.embed(prompt)
-            df.at[i, 'embedding'] = embedding
-            df.to_csv('../data/arxiv2.csv')
-except:
-    df.to_csv('../data/arxiv2.csv')
+            embeds[article_id] = embedding
+            with open('embeds.json', 'w') as f:
+                json.dump(embeds, f, indent=4)
+except Exception as err:
+    print('FUCK ERROR', err)
+    with open('embeds.json', 'w') as f:
+        json.dump(embeds, f, indent=4)
 
 b = time.time()
 
