@@ -16,22 +16,16 @@ llama = Llama(model_path=model_path, n_gpu_layers=n_gpu_layers, embedding=embedd
 df = pd.read_csv('../data/arxiv.csv')
 
 # embeds-json
-try:
-    with open('embeds.json', 'r') as f:
-        embeds = json.load(f)
-except FileNotFoundError:
-    print('NO FILE FOUND, CREATING NEW')
-    with open('embeds.json', 'w') as f:
-        embeds = {}
-        json.dump(embeds, f, indent=4)
+with open('embeds.json', 'r') as f:
+    embeds = json.load(f)
 
 # generate embeddings
 a = time.time()
 try:
     for i, row in df.iterrows():
-        if row.id not in embeds:
-            print('ITEM\t', i)
-            article_id = row.id
+        article_id = str(row.id)
+        if article_id not in embeds:
+            print('ITEM\t', i, article_id)
             abstract = row.abstract
             prompt = f'{abstract}'
             embedding = llama.embed(prompt)
