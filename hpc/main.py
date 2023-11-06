@@ -21,21 +21,20 @@ with open('embeds.json', 'r') as f:
 
 # generate embeddings
 a = time.time()
-try:
-    for i, row in df.iterrows():
-        article_id = str(row.id)
-        if article_id not in embeds:
-            print('ITEM\t', i, article_id)
-            abstract = row.abstract
-            prompt = f'{abstract}'
-            embedding = llama.embed(prompt)
-            embeds[article_id] = embedding
+for k, (i, row) in enumerate(df.iterrows()):
+    article_id = str(row.id)
+    if article_id not in embeds:
+        print(k, '\tITEM\t', i, article_id)
+        abstract = row.abstract
+        prompt = f'{abstract}'
+        embedding = llama.embed(prompt)
+        embeds[article_id] = embedding
+
+        # dump every 500th
+        if k % 500 == 0:
+            print('DUMPING')
             with open('embeds.json', 'w') as f:
                 json.dump(embeds, f, indent=4)
-except Exception as err:
-    print('FUCK ERROR', err)
-    with open('embeds.json', 'w') as f:
-        json.dump(embeds, f, indent=4)
 
 b = time.time()
 
