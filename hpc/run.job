@@ -6,7 +6,7 @@
 #SBATCH --time=01:00:00          # Run time (hh:mm:ss) - run for one hour max
 #SBATCH --partition=brown        # Run on either the Red or Brown queue
 #SBATCH --gres=gpu:4             # If you are using CUDA dependent package
-
+##SBATCH --nodelist=desktop[21,23-24] #Uncommet this for fast AF nodes. SPEEEEEEEEEED. This is the 1.12 baby 🚄💨💨💨💨💨🔥🔥🔥🔥
 echo "Running on $(hostname):"
 
 module load Python/3.9.6-GCCcore-11.2.0
