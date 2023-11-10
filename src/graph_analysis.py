@@ -15,7 +15,7 @@ sys.path.append('..')
 from src.graph_utilities import *
 
 ANALYSIS_LABEL = 'lcc'
-PLOT_TITLES = 'lcc'
+PLOT_TITLES = 'Largest connected component'
 PLOT_GRAPH = True
 
 def base_graph():
@@ -31,13 +31,25 @@ def lcc():
 
 def metropolis_hastings():
     G = lcc()
-    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() / 10)
+    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10)
+    G = G.subgraph(subgraph_nodes)
+    return G
+
+def forest_fire():
+    G = base_graph()
+    subgraph_nodes = forest_fire_sampling(G, subgraph_size=G.vcount() // 10)
+    G = G.subgraph(subgraph_nodes)
+    return G
+
+def random_walk():
+    G = base_graph()
+    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10)
     G = G.subgraph(subgraph_nodes)
     return G
 
 if __name__ == '__main__':
     # CHANGE THIS LINE TO CHANGE GRAPH
-    G = lcc()
+    G = random_walk()
 
     # make directory for figures if it doesn't exist
     if not os.path.exists(f'../figs/{ANALYSIS_LABEL}'):

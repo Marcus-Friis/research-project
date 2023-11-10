@@ -69,7 +69,7 @@ Below code is for forest fire sampling
 def geometric_random_number(p_forward):
     return np.random.geometric(p_forward)
 
-def forest_fire_sampling(G, sample_size: int, p_forward: float):
+def forest_fire_sampling(G, subgraph_size: int, p_forward: float = 0.1):
     sampled_nodes = set()
 
     # Function to start/restart the fire with a random node
@@ -81,7 +81,7 @@ def forest_fire_sampling(G, sample_size: int, p_forward: float):
     # Queue for nodes to visit
     to_visit = deque([start_fire()])
     
-    while len(sampled_nodes) < sample_size:
+    while len(sampled_nodes) < subgraph_size:
         if not to_visit:
             to_visit.append(start_fire())  # Restart the fire if needed
         
@@ -102,7 +102,7 @@ def forest_fire_sampling(G, sample_size: int, p_forward: float):
         # Select nW neighbors to follow
         selected_neighbors = random.sample(neighbors, nW) if nW < len(neighbors) else neighbors
         for neighbor in selected_neighbors:
-            if len(sampled_nodes) >= sample_size:
+            if len(sampled_nodes) >= subgraph_size:
                 break
             if neighbor not in sampled_nodes:
                 to_visit.append(neighbor)
