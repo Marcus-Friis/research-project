@@ -49,7 +49,7 @@ def random_walk():
 
 if __name__ == '__main__':
     # CHANGE THIS LINE TO CHANGE GRAPH
-    G = random_walk()
+    G = lcc()
 
     # make directory for figures if it doesn't exist
     if not os.path.exists(f'../figs/{ANALYSIS_LABEL}'):
