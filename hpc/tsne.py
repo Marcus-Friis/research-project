@@ -6,13 +6,14 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans, DBSCAN
 
-json_file = "lol.json"
+json_file = "embeds.json"
 with open(json_file, 'r') as f:
     data = json.load(f)
 
 keys = list(data.keys())
 print('NUM ARTICLES', len(keys))
-embeddings = [data[key]['embedding'] for key in keys]
+embeddings = np.array(list(data.values()))
+embeddings = embeddings[~np.isnan(embeddings).any(axis=1)]
 
 kmeans = KMeans(n_clusters=3, random_state=0).fit(embeddings)
 clusters = kmeans.labels_
