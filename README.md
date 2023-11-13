@@ -7,3 +7,5 @@ The data used in this project is the *[Arxiv HEP-PH (high energy physics phenome
 ## Used llama model
 https://huggingface.co/TheBloke/OpenBuddy-Llama2-13B-v11.1-GGUF
 openbuddy-llama2-13b-v11.1.Q5_K_M.gguf
+
+# TODO: ADD EMBEDDING AND ABSTRACT FOR 9405397
