@@ -59,6 +59,7 @@ if __name__ == '__main__':
     # # basic graph attributes
     print('number of nodes', G.vcount())
     print('number of edges', G.ecount())
+    print('diameter', G.diameter(directed=False))
     print('number of selfloops', sum(G.is_loop()))
     print('number of weakly connected components', len(G.components(mode='weak')))
     print('number of strongly connected components', len(G.components(mode='strong')))
