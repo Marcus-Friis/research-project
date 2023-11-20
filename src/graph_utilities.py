@@ -5,7 +5,10 @@ import random
 from collections import deque
 
 
-def random_walk_sampling(g, teleportation_rate=0.05, start_node=None, subgraph_size=1000):
+def random_walk_sampling(g, teleportation_rate=0.05, start_node=None, subgraph_size=1000, seed=None):
+    if seed is not None:
+        random.seed(seed)
+        
     # init starting node
     if start_node is None:
         current_node = random.choice(g.vs)
@@ -33,7 +36,10 @@ def random_walk_sampling(g, teleportation_rate=0.05, start_node=None, subgraph_s
     return subgraph_nodes
 
 
-def metropolis_hastings_sampling(g, start_node=None, subgraph_size=1000):
+def metropolis_hastings_sampling(g, start_node=None, subgraph_size=1000, seed=None):
+    if seed is not None:
+        random.seed(seed)
+        
     # init starting node
     if start_node is None:
         current_node = random.choice(g.vs)
@@ -124,20 +130,25 @@ def lcc():
     G = G.components(mode='weak').giant()
     return G
 
-def metropolis_hastings():
-    G = lcc()
-    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10)
+def lcc_excluding_no_content():
+    g = lcc()
+    g.delete_vertices(g.vs.select(lambda x: x['_nx_name'] in ['9704383', '9305237']))
+    return g
+
+def metropolis_hastings(seed=None):
+    G = lcc_excluding_no_content()
+    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10, seed=seed)
     G = G.subgraph(subgraph_nodes)
     return G
 
 def forest_fire():
-    G = base_graph()
+    G = lcc_excluding_no_content(seed=None)
     subgraph_nodes = forest_fire_sampling(G, subgraph_size=G.vcount() // 10)
     G = G.subgraph(subgraph_nodes)
     return G
 
-def random_walk():
-    G = base_graph()
-    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10)
+def random_walk(seed=None):
+    G = lcc_excluding_no_content(seed=None)
+    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10, seed=seed)
     G = G.subgraph(subgraph_nodes)
     return G

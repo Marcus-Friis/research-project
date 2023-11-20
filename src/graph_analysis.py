@@ -14,47 +14,41 @@ import sys
 sys.path.append('..')
 from src.graph_utilities import *
 
-ANALYSIS_LABEL = 'forest-fire'
-PLOT_TITLES = 'Forest Fire Subgraph'
+
+ANALYSIS_LABEL = 'mhs'
+PLOT_TITLES = 'Metroplis-Hastings'
 PLOT_GRAPH = True
-FUNC = forest_fire
+SEED = 0
+G = metropolis_hastings(seed=SEED)
 
 
 if __name__ == '__main__':
-    # CHANGE THIS LINE TO CHANGE GRAPH
-    G = FUNC()
-
     # make directory for figures if it doesn't exist
     if not os.path.exists(f'../figs/{ANALYSIS_LABEL}'):
         os.makedirs(f'../figs/{ANALYSIS_LABEL}')
+        
+    # COMMUNITY DETECTION
+    communities = la.find_partition(G, la.ModularityVertexPartition, seed=SEED)
 
     # # GRAPH PROPERTIES
     # basic graph attributes
-    print('number of nodes', G.vcount())
-    print('number of edges', G.ecount())
-    print('diameter', G.diameter(directed=False))
-    print('number of selfloops', sum(G.is_loop()))
-    print('number of weakly connected components', len(G.components(mode='weak')))
-    print('number of strongly connected components', len(G.components(mode='strong')))
-    print('average clustering coefficient', G.transitivity_avglocal_undirected())
-    print('fraction of closed triads', G.transitivity_undirected())
-    print('density of graph', G.density(loops=False))
-
-
+    with open(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-graph-properties.txt', 'w') as f:
+        f.write(f'number of nodes\t {G.vcount()}\n')
+        f.write(f'number of edges\t {G.ecount()}\n')
+        f.write(f'diameter\t {G.diameter(directed=False)}\n')
+        f.write(f'number of selfloops\t {sum(G.is_loop())}\n')
+        f.write(f'number of weakly connected components\t {len(G.components(mode="weak"))}\n')
+        f.write(f'number of strongly connected components\t {len(G.components(mode="strong"))}\n')
+        f.write(f'average clustering coefficient\t {G.transitivity_avglocal_undirected()}\n')
+        f.write(f'fraction of closed triads\t {G.transitivity_undirected()}\n')
+        f.write(f'density of graph\t {G.density(loops=False)}\n')
+        f.write(f'assortativity coefficient\t {G.assortativity_degree(directed=False)}\n')
+        f.write(f'modularity of graph\t {communities.modularity}\n')
+        
     # DEGREE DISTRIBUTION
     # get list of in- and out-degrees
     in_degrees = G.indegree()
     out_degrees = G.outdegree()
-
-    # print basic degree statistics
-    # print("Highest indegree: ", max(in_degrees))
-    # print("Highest outdegree: ", max(out_degrees),"\n")
-
-    # print("Lowest indegree: ", min(in_degrees))
-    # print("Lowest outdegree: ", min(out_degrees),"\n")
-
-    # print(f"Average in-degree: {np.mean(in_degrees)}")
-    # print(f"Average out-degree: {np.mean(out_degrees)}")
 
     # get frequency of each degree and normalize to density
     d_in, v_in = np.unique(in_degrees, return_counts=True)
@@ -142,14 +136,9 @@ if __name__ == '__main__':
     ax.set_ylim(y_axis_lower_bound*2, 1.1)
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-out-degree-ccdf.svg')
 
-    # COMMUNITY DETECTION
-    communities = la.find_partition(G, la.ModularityVertexPartition)
-    print('Modularity', G.modularity(communities))
-
     # visualize graph
     if PLOT_GRAPH:
         target = f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-graph.svg'
         layout = G.layout("fr")
         ig.plot(communities, layout=layout, vertex_size=2, vertex_label=None, vertex_frame_width=0, 
                 edge_arrow_size=0.02, edge_width=0.02, target=target)
-    
