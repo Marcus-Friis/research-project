@@ -14,49 +14,22 @@ import sys
 sys.path.append('..')
 from src.graph_utilities import *
 
-ANALYSIS_LABEL = 'lcc'
-PLOT_TITLES = 'Largest connected component'
+ANALYSIS_LABEL = 'forest-fire'
+PLOT_TITLES = 'Forest Fire Subgraph'
 PLOT_GRAPH = True
+FUNC = forest_fire
 
-def base_graph():
-    # load graph
-    G_nx = nx.read_edgelist('../data/Cit-HepPh.txt', create_using=nx.DiGraph)
-    G = ig.Graph.from_networkx(G_nx)
-    return G
-
-def lcc():
-    G = base_graph()
-    G = G.components(mode='weak').giant()
-    return G
-
-def metropolis_hastings():
-    G = lcc()
-    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10)
-    G = G.subgraph(subgraph_nodes)
-    return G
-
-def forest_fire():
-    G = base_graph()
-    subgraph_nodes = forest_fire_sampling(G, subgraph_size=G.vcount() // 10)
-    G = G.subgraph(subgraph_nodes)
-    return G
-
-def random_walk():
-    G = base_graph()
-    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10)
-    G = G.subgraph(subgraph_nodes)
-    return G
 
 if __name__ == '__main__':
     # CHANGE THIS LINE TO CHANGE GRAPH
-    G = lcc()
+    G = FUNC()
 
     # make directory for figures if it doesn't exist
     if not os.path.exists(f'../figs/{ANALYSIS_LABEL}'):
         os.makedirs(f'../figs/{ANALYSIS_LABEL}')
 
     # # GRAPH PROPERTIES
-    # # basic graph attributes
+    # basic graph attributes
     print('number of nodes', G.vcount())
     print('number of edges', G.ecount())
     print('diameter', G.diameter(directed=False))
@@ -177,6 +150,6 @@ if __name__ == '__main__':
     if PLOT_GRAPH:
         target = f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-graph.svg'
         layout = G.layout("fr")
-        ig.plot(communities, layout=layout, vertex_size=0, vertex_label=None, vertex_frame_width=0, 
+        ig.plot(communities, layout=layout, vertex_size=2, vertex_label=None, vertex_frame_width=0, 
                 edge_arrow_size=0.02, edge_width=0.02, target=target)
     

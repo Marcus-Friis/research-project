@@ -112,3 +112,32 @@ def forest_fire_sampling(G, subgraph_size: int, p_forward: float = 0.1):
 '''
 ends here
 '''
+
+def base_graph():
+    # load graph
+    G_nx = nx.read_edgelist('../data/Cit-HepPh.txt', create_using=nx.DiGraph)
+    G = ig.Graph.from_networkx(G_nx)
+    return G
+
+def lcc():
+    G = base_graph()
+    G = G.components(mode='weak').giant()
+    return G
+
+def metropolis_hastings():
+    G = lcc()
+    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10)
+    G = G.subgraph(subgraph_nodes)
+    return G
+
+def forest_fire():
+    G = base_graph()
+    subgraph_nodes = forest_fire_sampling(G, subgraph_size=G.vcount() // 10)
+    G = G.subgraph(subgraph_nodes)
+    return G
+
+def random_walk():
+    G = base_graph()
+    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10)
+    G = G.subgraph(subgraph_nodes)
+    return G
