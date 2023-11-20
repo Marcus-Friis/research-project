@@ -10,6 +10,9 @@
 # ignore arxiv.json
 arxiv.json
 
+# ignore large svg graph plots
+*graph.svg
+
 ############################
 ######### STANDARD #########
 ############################
