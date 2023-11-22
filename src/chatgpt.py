@@ -4,13 +4,13 @@ from configparser import ConfigParser
 import asyncio
 import random
 
-async def prompt(text):
-    await asyncio.sleep(random.random()*10)
+async def prompt(text, sleep=0):
+    await asyncio.sleep(sleep)
     print(text)
     return text
 
 async def batch_prompt(*args):
-    return await asyncio.gather(*[prompt(arg) for arg in args])
+    return await asyncio.gather(*[prompt(arg[0], sleep=arg[1]) for arg in args])
 
 
 class Chad:
@@ -22,24 +22,26 @@ class Chad:
         self.client = OpenAI(api_key=api_key)
         self.model = model
     
-    async def async_prompt(self, text, context=''):
+    async def async_prompt(self, text, context='', sleep=0):
+        await asyncio.sleep(sleep)
+        print(f'requesting\t {sleep}')
         messages = [
             {'role': 'system', 'content': context},
             {'role': 'user', 'content': text}
             ]
-        
-        reponse = await self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             max_tokens=10
             )
-        return reponse
+        print(f'done\t {sleep}')
+        return response
     
-    def prompt(self, text, context=''):
-        return asyncio.run(self.async_prompt(text, context))
+    def prompt(self, text, context='', sleep=0):
+        return asyncio.run(self.async_prompt(text, context=context, sleep=sleep))
     
     async def async_batch_prompt(self, *args):
-        return await asyncio.gather(*[self.async_prompt(arg) for arg in args])
+        return await asyncio.gather(*[self.async_prompt(*arg) for arg in args])
     
     def batch_prompt(self, *args):
         return asyncio.run(self.async_batch_prompt(*args))
@@ -76,20 +78,30 @@ if __name__ == '__main__':
     for i, (v, u) in enumerate(edges):
         abstract_v = arxiv[v]['metadata']['entry']['summary']
         abstract_u = arxiv[u]['metadata']['entry']['summary']
-        prompt = f"""
+        text = f"""
         Given the following abstract: {abstract_v}
         How does it relate to this abstract: {abstract_u}
         Which of the following categories does it belong to: Agreement, Disagreement, Neutral.
         Describe it using strictly the category
         """
-        prompts.append(prompt)
+        context = ''
+        sleep = i
+        entry = (text, context, sleep)
+        prompts.append(entry)
         
     a = time.time()
     out = chad.batch_prompt(*prompts)
-    print(out)
     print('EXECUTED IN:\t', time.time() - a)
     
     import pickle
-    with open('../data/chad.pkl', 'wb') as f:
+    with open(f'../data/chad_{start}_{end}.pkl', 'wb') as f:
         pickle.dump(out, f)
     
+    
+    # HOW TO UNPICKLE AND INTERPRET
+    # import pickle
+    
+    # with open('../data/chad.pkl', 'rb') as f:
+    #     response = pickle.load(f)
+    
+    # print([r.choices[0].message.content for r in response])
