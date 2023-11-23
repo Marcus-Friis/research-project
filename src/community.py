@@ -12,11 +12,11 @@ if __name__ == '__main__':
     g = lcc()
     g_un = g.as_undirected()
     
-    community = la.find_partition(g, la.ModularityVertexPartition)
+    community = la.find_partition(g_un, la.ModularityVertexPartition)
     print('leiden')
     community_summary(community)
     
-    community = g.community_infomap()
+    community = g_un.community_infomap()
     print('infomap')
     community_summary(community)
 
@@ -24,3 +24,14 @@ if __name__ == '__main__':
     print('fastgreedy')
     community_summary(community)
     
+    community = g_un.community_label_propagation()
+    print('label propagation')
+    community_summary(community)
+        
+    community = g_un.community_leiden(resolution=0.1)
+    print('community_leiden, resolution parameter=0.1')
+    community_summary(community)
+
+    community = g_un.community_walktrap().as_clustering()
+    print('community_walktrap')
+    community_summary(community)
