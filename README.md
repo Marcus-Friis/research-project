@@ -15,7 +15,7 @@ openbuddy-llama2-13b-v11.1.Q5_K_M.gguf
 
 ## TODO
 
-* try all sorts of community detection
+* add embedding 191 nan
 * do clustering
 * compare clustering and community detection
 * openai api access / script -- make sure to set seed and maybe temperature?
