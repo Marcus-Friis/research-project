@@ -6,6 +6,8 @@ By Mads Høgenhaug, Marcus Friis, Morten Pedersen.
 
 The data used in this project is the *[Arxiv HEP-PH (high energy physics phenomenology) citation graph](https://snap.stanford.edu/data/cit-HepPh.html)*.
 
+The embedded data: <https://www.mediafire.com/file/im0jf93tdihemrg/combined_data.rar/file>
+
 ## Used llama model
 
 <https://huggingface.co/TheBloke/OpenBuddy-Llama2-13B-v11.1-GGUF>
