@@ -132,7 +132,7 @@ def lcc():
 
 def lcc_excluding_no_content():
     g = lcc()
-    g.delete_vertices(g.vs.select(lambda x: x['_nx_name'] in ['9704383', '9305237']))
+    g.delete_vertices(g.vs.select(lambda x: x['_nx_name'] in ['9812218', '9305237']))
     return g
 
 def metropolis_hastings(seed=None):
