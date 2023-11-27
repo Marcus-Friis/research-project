@@ -2,7 +2,15 @@ from openai import AsyncOpenAI as OpenAI, RateLimitError, APIConnectionError
 import json
 from configparser import ConfigParser
 import asyncio
-from tenacity import retry, stop_after_attempt, wait_fixed, wait_random, retry_if_exception_type, RetryError
+from tenacity import (
+    retry, 
+    stop_after_attempt, 
+    wait_fixed, 
+    wait_exponential, 
+    wait_random, 
+    retry_if_exception_type, 
+    RetryError
+)
 import random
 
 
@@ -34,7 +42,8 @@ class Chad:
         
         @retry(stop=stop_after_attempt(self.stop_after_attempt), 
                wait=wait_fixed(self.wait_fixed) + wait_random(0, 10),
-               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError)))
+               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError))
+               )
         async def wrapper():
             print(f'prompting {identifier}')
             messages = [
@@ -50,8 +59,8 @@ class Chad:
             return response
         try:
             return await wrapper()
-        except RetryError:
-            print(f'failed {identifier}')
+        except RetryError as e:
+            print(f'failed {identifier}, {e}')
             return None
     
     def prompt(self, text, context='', sleep=0):
@@ -91,7 +100,6 @@ if __name__ == '__main__':
     chad = Chad()
     
     prompts = []
-    
     for i, (v, u) in enumerate(edges):
         try:
             abstract_v = arxiv[v]['metadata']['entry']['summary']
@@ -99,12 +107,20 @@ if __name__ == '__main__':
         except KeyError:
             continue
         text = f"""
-        Given the following abstract: {abstract_v}
-        How does it relate to this abstract: {abstract_u}
-        Which of the following categories does it belong to: Agreement, Disagreement, Neutral.
-        Describe it using strictly the category
+        Paper A: {abstract_v}
+        Paper B: {abstract_u}
         """
-        context = ''
+        context = """
+        You are a high energy physics expert.
+        You will get the abstract of a paper that cites another paper within the field of high energy physics.
+        You will evaluate to the best of your ability, whether the paper agrees with the other paper.
+        Paper A cites paper B.
+        The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:"
+        You will only provide single word answer, evaluating the agreement between the papers.
+        Use "agreement" when Paper A clearly agrees with or builds upon the conclusions of Paper B.
+        Use "disagreement" when Paper A clearly contradicts or refutes the conclusions of Paper B.
+        Use "neutral" when Paper A is neutral to the conclusions of Paper B or if it is unclear how the papers relate.
+        """
         delay = 1*i
         identifier = f'{v} {u}'
         entry = (text, context, delay, identifier)
