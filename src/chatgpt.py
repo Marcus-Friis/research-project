@@ -1,8 +1,10 @@
-from openai import AsyncOpenAI as OpenAI
+from openai import AsyncOpenAI as OpenAI, RateLimitError, APIConnectionError
 import json
 from configparser import ConfigParser
 import asyncio
+from tenacity import retry, stop_after_attempt, wait_fixed, wait_random, retry_if_exception_type, RetryError
 import random
+
 
 async def prompt(text, sleep=0):
     await asyncio.sleep(sleep)
@@ -14,28 +16,43 @@ async def batch_prompt(*args):
 
 
 class Chad:
-    def __init__(self, model='gpt-3.5-turbo') -> None:
+    def __init__(self, 
+                 model='gpt-3.5-turbo',
+                 wait_fixed=1,
+                 stop_after_attempt=10) -> None:
         config = ConfigParser()
         config.read('config.ini')
         api_key = config['openai']['api_key']
         
         self.client = OpenAI(api_key=api_key)
         self.model = model
+        self.wait_fixed = wait_fixed
+        self.stop_after_attempt = stop_after_attempt
     
-    async def async_prompt(self, text, context='', sleep=0):
-        await asyncio.sleep(sleep)
-        print(f'requesting\t {sleep}')
-        messages = [
-            {'role': 'system', 'content': context},
-            {'role': 'user', 'content': text}
-            ]
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            max_tokens=10
-            )
-        print(f'done\t {sleep}')
-        return response
+    async def async_prompt(self, text, context='', delay=0, identifier=None):
+        await asyncio.sleep(delay)
+        
+        @retry(stop=stop_after_attempt(self.stop_after_attempt), 
+               wait=wait_fixed(self.wait_fixed) + wait_random(0, 10),
+               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError)))
+        async def wrapper():
+            print(f'prompting {identifier}')
+            messages = [
+                {'role': 'system', 'content': context},
+                {'role': 'user', 'content': text}
+                ]
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=10
+                )
+            print(f'done {identifier}')
+            return response
+        try:
+            return await wrapper()
+        except RetryError:
+            print(f'failed {identifier}')
+            return None
     
     def prompt(self, text, context='', sleep=0):
         return asyncio.run(self.async_prompt(text, context=context, sleep=sleep))
@@ -76,8 +93,11 @@ if __name__ == '__main__':
     prompts = []
     
     for i, (v, u) in enumerate(edges):
-        abstract_v = arxiv[v]['metadata']['entry']['summary']
-        abstract_u = arxiv[u]['metadata']['entry']['summary']
+        try:
+            abstract_v = arxiv[v]['metadata']['entry']['summary']
+            abstract_u = arxiv[u]['metadata']['entry']['summary']
+        except KeyError:
+            continue
         text = f"""
         Given the following abstract: {abstract_v}
         How does it relate to this abstract: {abstract_u}
@@ -85,8 +105,9 @@ if __name__ == '__main__':
         Describe it using strictly the category
         """
         context = ''
-        sleep = i
-        entry = (text, context, sleep)
+        delay = 1*i
+        identifier = f'{v} {u}'
+        entry = (text, context, delay, identifier)
         prompts.append(entry)
         
     a = time.time()
@@ -104,4 +125,5 @@ if __name__ == '__main__':
     # with open('../data/chad.pkl', 'rb') as f:
     #     response = pickle.load(f)
     
+    # print(response)
     # print([r.choices[0].message.content for r in response])
