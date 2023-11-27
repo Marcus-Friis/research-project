@@ -13,6 +13,9 @@ arxiv.json
 # ignore large svg graph plots
 *graph.svg
 
+# ignore config file
+config.ini
+
 ############################
 ######### STANDARD #########
 ############################
