@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import pandas as pd
 from sklearn.cluster import AgglomerativeClustering, KMeans
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
 from graph_utilities import lcc_excluding_no_content
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     embeds = embeds[mask]
     keys = keys[mask]
     print('LCC filtered shapes', keys.size, embeds.shape)
+    assert len(keys) == len(nodes)  # sanity check
     
     # community detection
     print('detecting communities')
@@ -54,3 +56,13 @@ if __name__ == '__main__':
     ari = adjusted_rand_score(community_labels, clustering_labels)
     print(f'NMI: {nmi}')
     print(f'ARI: {ari}')
+
+    # save results
+    print('saving')
+    data = {
+        'nodes': np.sort(nodes),
+        'community_labels': community_labels,
+        'clustering_labels': clustering_labels
+    }
+    df = pd.DataFrame(data)
+    df.to_csv('../data/clustering.csv', index=False)
