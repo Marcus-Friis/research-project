@@ -1,8 +1,11 @@
 import json
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 from sklearn.cluster import AgglomerativeClustering, KMeans
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
+from sklearn.manifold import TSNE
 from graph_utilities import lcc_excluding_no_content
 import leidenalg as la
 
@@ -66,3 +69,19 @@ if __name__ == '__main__':
     }
     df = pd.DataFrame(data)
     df.to_csv('../data/clustering.csv', index=False)
+
+    # tsne plot
+    print('plotting')
+    tsne = TSNE(n_components=2, random_state=0)
+    embeds = tsne.fit_transform(embeds)
+    embeds = embeds[clustering_idx]
+    
+    fig, ax = plt.subplots()
+    ax.scatter(embeds[:, 0], embeds[:, 1], c=clustering_labels, s=1, alpha=.1)
+    ax.set_title('Clustering Labels')
+    fig.savefig('../figs/clustering_scatter.png')
+    
+    fig, ax = plt.subplots()
+    ax.scatter(embeds[:, 0], embeds[:, 1], c=community_labels, s=1, alpha=.1)
+    ax.set_title('Community Labels')
+    fig.savefig('../figs/community_scatter.png')
