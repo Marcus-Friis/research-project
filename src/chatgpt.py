@@ -38,6 +38,9 @@ class Chad:
         self.stop_after_attempt = stop_after_attempt
     
     async def async_prompt(self, text, context='', delay=0, identifier=None):
+        if text is None:
+            return None
+        
         await asyncio.sleep(delay)
         
         @retry(stop=stop_after_attempt(self.stop_after_attempt), 
@@ -61,7 +64,6 @@ class Chad:
             return await wrapper()
         except RetryError as e:
             print(f'failed {identifier}, {e}')
-            return None
     
     def prompt(self, text, context='', sleep=0):
         return asyncio.run(self.async_prompt(text, context=context, sleep=sleep))
@@ -80,7 +82,7 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument('start', type=int, help='Start value of the range', default=0, nargs='?')
-    parser.add_argument('end', type=int, help='End value of the range', default=-1, nargs='?')
+    parser.add_argument('end', type=int, help='End value of the range', default=1, nargs='?')
 
     args = parser.parse_args()
 
@@ -105,7 +107,10 @@ if __name__ == '__main__':
             abstract_v = arxiv[v]['metadata']['entry']['summary']
             abstract_u = arxiv[u]['metadata']['entry']['summary']
         except KeyError:
+            # Handle KeyError by appending None to out
+            prompts.append((None, None, None, f'{v} {u}'))
             continue
+        
         text = f"""
         Paper A: {abstract_v}
         Paper B: {abstract_u}
@@ -133,6 +138,12 @@ if __name__ == '__main__':
     import pickle
     with open(f'../data/chad_{start}_{end}.pkl', 'wb') as f:
         pickle.dump(out, f)
+        
+    layer = [r.choices[0].message.content if r is not None else None for r in out]
+    assert len(layer) == len(edges)
+    with open(f'../data/edges_{start}_{end}.txt', 'w') as f:
+        for i in range(len(edges)):
+            f.write(f'{edges[i][0]}\t{edges[i][1]}\t{layer[i]}\n')
     
     
     # HOW TO UNPICKLE AND INTERPRET
