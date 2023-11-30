@@ -52,42 +52,48 @@ if __name__ == '__main__':
     print('Modularity', community.modularity)
     print('Silhouette', silhouette_score(embeds, community_labels))
     
-    # clustering
-    print('clustering')
-    # clustering = AgglomerativeClustering(n_clusters=num_communities, linkage='single').fit(embeds)
-    clustering = KMeans(n_clusters=num_communities, random_state=0).fit(embeds)
-    clustering_labels = clustering.labels_
-    print('Modularity', g.modularity(clustering_labels[original_idx]))
-    print('Silhouette', silhouette_score(embeds, clustering_labels))
-    
-    # compare community and clustering
-    print('comparing')
-    nmi = normalized_mutual_info_score(community_labels, clustering_labels)
-    ari = adjusted_rand_score(community_labels, clustering_labels)
-    print(f'NMI: {nmi}')
-    print(f'ARI: {ari}')
-
-    # save results
-    print('saving')
-    data = {
-        'nodes': np.sort(nodes),
-        'community_labels': community_labels,
-        'clustering_labels': clustering_labels
-    }
-    df = pd.DataFrame(data)
-    df.to_csv('../data/clustering.csv', index=False)
-
-    # tsne plot
-    print('plotting')
+    # dimensionality reduction
+    print('reducing dimensionality')
     tsne = TSNE(n_components=2, random_state=0)
-    embeds = tsne.fit_transform(embeds)
+    tsne_embeds = tsne.fit_transform(embeds)
     
+    # community plot
+    print('plotting community')
     fig, ax = plt.subplots()
-    ax.scatter(embeds[:, 0], embeds[:, 1], c=clustering_labels, s=1, alpha=.1)
-    ax.set_title('Clustering Labels')
-    fig.savefig('../figs/clustering_scatter.png')
-    
-    fig, ax = plt.subplots()
-    ax.scatter(embeds[:, 0], embeds[:, 1], c=community_labels, s=1, alpha=.1)
+    ax.scatter(tsne_embeds[:, 0], tsne_embeds[:, 1], c=community_labels, s=1, alpha=.1)
     ax.set_title('Community Labels')
     fig.savefig('../figs/community_scatter.png')
+    
+    data = {
+        'nodes': np.sort(nodes),
+        'community_labels': community_labels
+    }
+    
+    for k in [5, 10, 20, 50, 100]:
+        # clustering
+        print(f'clustering k={k}')
+        # clustering = AgglomerativeClustering(n_clusters=num_communities, linkage='single').fit(embeds)
+        clustering = KMeans(n_clusters=k, random_state=0).fit(embeds)
+        clustering_labels = clustering.labels_
+        data[f'clustering_labels_{k}'] = clustering_labels
+        print('Modularity', g.modularity(clustering_labels[original_idx]))
+        print('Silhouette', silhouette_score(embeds, clustering_labels))
+        
+        # compare community and clustering
+        print('comparing')
+        nmi = normalized_mutual_info_score(community_labels, clustering_labels)
+        ari = adjusted_rand_score(community_labels, clustering_labels)
+        print(f'NMI: {nmi}')
+        print(f'ARI: {ari}')
+
+        # plot clustering
+        print('plotting clustering')
+        fig, ax = plt.subplots()
+        ax.scatter(tsne_embeds[:, 0], tsne_embeds[:, 1], c=clustering_labels, s=1, alpha=.1)
+        ax.set_title(f'T-SNE Clustering, $k$={k}')
+        fig.savefig(f'../figs/clustering_{k}_scatter.png')
+    
+    # save results
+    print('saving')
+    df = pd.DataFrame(data)
+    df.to_csv('../data/clustering.csv', index=False)
