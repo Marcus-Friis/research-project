@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 from sklearn.cluster import AgglomerativeClustering, KMeans
-from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score
+from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, silhouette_score
 from sklearn.manifold import TSNE
 from graph_utilities import lcc_excluding_no_content
 import leidenalg as la
@@ -17,6 +17,9 @@ if __name__ == '__main__':
         
     keys = np.array(list(embeds.keys()))
     embeds = np.array(list(embeds.values()))
+    idx = np.argsort(keys)
+    keys = keys[idx]
+    embeds = embeds[idx]
     print('Raw shapes', keys.size, embeds.shape)
     
     # filter nan embeds
@@ -44,14 +47,18 @@ if __name__ == '__main__':
     community = la.find_partition(g, la.ModularityVertexPartition, seed=0)
     num_communities = len(community)
     community_idx = np.argsort(nodes)
+    original_idx = np.argsort(community_idx)
     community_labels = np.array(community.membership)[community_idx]
+    print('Modularity', community.modularity)
+    print('Silhouette', silhouette_score(embeds, community_labels))
     
     # clustering
     print('clustering')
     # clustering = AgglomerativeClustering(n_clusters=num_communities, linkage='single').fit(embeds)
     clustering = KMeans(n_clusters=num_communities, random_state=0).fit(embeds)
-    clustering_idx = np.argsort(keys)
-    clustering_labels = clustering.labels_[clustering_idx]
+    clustering_labels = clustering.labels_
+    print('Modularity', g.modularity(clustering_labels[original_idx]))
+    print('Silhouette', silhouette_score(embeds, clustering_labels))
     
     # compare community and clustering
     print('comparing')
@@ -74,7 +81,6 @@ if __name__ == '__main__':
     print('plotting')
     tsne = TSNE(n_components=2, random_state=0)
     embeds = tsne.fit_transform(embeds)
-    embeds = embeds[clustering_idx]
     
     fig, ax = plt.subplots()
     ax.scatter(embeds[:, 0], embeds[:, 1], c=clustering_labels, s=1, alpha=.1)
