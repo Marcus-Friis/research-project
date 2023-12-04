@@ -27,12 +27,14 @@ class Chad:
     def __init__(self, 
                  model='gpt-3.5-turbo',
                  timeout=60,
+                 max_tokens=10,
                  wait_fixed=1,
                  stop_after_attempt=10) -> None:
         self.model = model
         self.wait_fixed = wait_fixed
         self.stop_after_attempt = stop_after_attempt
         self.timeout = timeout
+        self.max_tokens = max_tokens
         
         config = ConfigParser()
         config.read('config.ini')
@@ -59,7 +61,7 @@ class Chad:
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=10
+                max_tokens=self.max_tokens
                 )
             print(f'done {identifier}')
             return response
