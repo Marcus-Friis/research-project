@@ -50,7 +50,7 @@ class Chad:
         
         @retry(stop=stop_after_attempt(self.stop_after_attempt), 
                wait=wait_fixed(self.wait_fixed) + wait_random(0, 10),
-               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError) | retry_if_exception_type(APITimeoutError))
+               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError) | retry_if_exception_type(APITimeoutError) | retry_if_exception_type(asyncio.TimeoutError))
                )
         async def wrapper():
             print(f'prompting {identifier}')
@@ -58,11 +58,14 @@ class Chad:
                 {'role': 'system', 'content': context},
                 {'role': 'user', 'content': text}
                 ]
-            response = await self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                max_tokens=self.max_tokens
-                )
+            response = await asyncio.wait_for(
+                self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                    max_tokens=self.max_tokens
+                    ),
+                timeout=self.timeout
+            )
             print(f'done {identifier}')
             return response
         try:
