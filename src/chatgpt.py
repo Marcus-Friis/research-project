@@ -1,4 +1,4 @@
-from openai import AsyncOpenAI as OpenAI, RateLimitError, APIConnectionError
+from openai import AsyncOpenAI as OpenAI, RateLimitError, APIConnectionError, APITimeoutError
 import json
 from configparser import ConfigParser
 import asyncio
@@ -26,16 +26,19 @@ async def batch_prompt(*args):
 class Chad:
     def __init__(self, 
                  model='gpt-3.5-turbo',
+                 timeout=60,
                  wait_fixed=1,
                  stop_after_attempt=10) -> None:
+        self.model = model
+        self.wait_fixed = wait_fixed
+        self.stop_after_attempt = stop_after_attempt
+        self.timeout = timeout
+        
         config = ConfigParser()
         config.read('config.ini')
         api_key = config['openai']['api_key']
         
-        self.client = OpenAI(api_key=api_key)
-        self.model = model
-        self.wait_fixed = wait_fixed
-        self.stop_after_attempt = stop_after_attempt
+        self.client = OpenAI(api_key=api_key, timeout=self.timeout)
     
     async def async_prompt(self, text, context='', delay=0, identifier=None):
         if text is None:
@@ -45,7 +48,7 @@ class Chad:
         
         @retry(stop=stop_after_attempt(self.stop_after_attempt), 
                wait=wait_fixed(self.wait_fixed) + wait_random(0, 10),
-               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError))
+               retry=(retry_if_exception_type(RateLimitError) | retry_if_exception_type(APIConnectionError) | retry_if_exception_type(APITimeoutError))
                )
         async def wrapper():
             print(f'prompting {identifier}')
