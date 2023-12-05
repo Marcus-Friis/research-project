@@ -29,12 +29,14 @@ class Chad:
                  timeout=60,
                  max_tokens=10,
                  wait_fixed=1,
-                 stop_after_attempt=10) -> None:
+                 stop_after_attempt=10,
+                 seed=None) -> None:
         self.model = model
         self.wait_fixed = wait_fixed
         self.stop_after_attempt = stop_after_attempt
         self.timeout = timeout
         self.max_tokens = max_tokens
+        self.seed = seed
         
         config = ConfigParser()
         config.read('config.ini')
@@ -62,7 +64,8 @@ class Chad:
                 self.client.chat.completions.create(
                     model=self.model,
                     messages=messages,
-                    max_tokens=self.max_tokens
+                    max_tokens=self.max_tokens,
+                    seed=self.seed
                     ),
                 timeout=self.timeout
             )
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     edges = [edge.strip().split('\t') for edge in edges]
     edges = edges[start:end]
     
-    chad = Chad()
+    chad = Chad(seed=42)
     context = """
     You are a high energy physics expert.
     You will get the abstract of a paper that cites another paper within the field of high energy physics.
