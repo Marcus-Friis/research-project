@@ -108,6 +108,17 @@ if __name__ == '__main__':
     edges = edges[start:end]
     
     chad = Chad()
+    context = """
+    You are a high energy physics expert.
+    You will get the abstract of a paper that cites another paper within the field of high energy physics.
+    You will evaluate to the best of your ability, whether the paper agrees with the other paper.
+    Paper A cites paper B.
+    The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:"
+    You will only provide single word answer, evaluating the agreement between the papers.
+    Use "agreement" when Paper A clearly agrees with or builds upon the conclusions of Paper B.
+    Use "disagreement" when Paper A clearly contradicts or refutes the conclusions of Paper B.
+    Use "neutral" when Paper A is neutral to the conclusions of Paper B or if it is unclear how the papers relate.
+    """
     
     prompts = []
     for i, (v, u) in enumerate(edges):
@@ -123,19 +134,8 @@ if __name__ == '__main__':
         Paper A: {abstract_v}
         Paper B: {abstract_u}
         """
-        context = """
-        You are a high energy physics expert.
-        You will get the abstract of a paper that cites another paper within the field of high energy physics.
-        You will evaluate to the best of your ability, whether the paper agrees with the other paper.
-        Paper A cites paper B.
-        The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:"
-        You will only provide single word answer, evaluating the agreement between the papers.
-        Use "agreement" when Paper A clearly agrees with or builds upon the conclusions of Paper B.
-        Use "disagreement" when Paper A clearly contradicts or refutes the conclusions of Paper B.
-        Use "neutral" when Paper A is neutral to the conclusions of Paper B or if it is unclear how the papers relate.
-        """
         delay = 1*i
-        identifier = f'{v} {u}'
+        identifier = f'{i}:\t{v} {u}'
         entry = (text, context, delay, identifier)
         prompts.append(entry)
         
