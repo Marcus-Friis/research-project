@@ -83,7 +83,7 @@ if __name__ == '__main__':
     
     start = 0
     end = len(edges)
-    size = 1
+    size = 100
     np.random.seed(42)
     idx = np.random.uniform(start, end, size=size).astype(int)
     edges = np.array(edges)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
         entry = (text, context, delay, identifier)
         prompts.append(entry)
 
-    chad = Chad(wait_fixed=10, model=model, timeout=10)
+    chad = Chad(wait_fixed=10, model=model)
     
     x = []
     for N in range(5):
@@ -126,4 +126,29 @@ if __name__ == '__main__':
         new_x.append(inner_list)
     x = new_x
             
-    print(np.array(x).T)
+    x = np.array(x).T
+    x = np.char.lower(x)
+    
+    print(x)
+    
+    ## CODE FOR ANALYSIS
+    # import pandas as pd
+    # df = pd.DataFrame([' '.join(edge)for edge in edges], columns=['edge'])
+    # df['labels'] = x.tolist()
+    
+    # def label_check(x):
+    #     if 'disagree' in x:
+    #         return -1
+    #     if 'agree' in x:
+    #         return 1
+    #     if 'neutral' in x:
+    #         return 0
+    #     return np.nan
+    
+    # df['label_values'] = [[label_check(text) for text in row] for row in x]
+    
+    # df['mode'] = df.label_values.apply(lambda x: max(set(x), key=x.count))
+    # df['std'] = df.label_values.apply(np.nanstd)
+    
+    # print(df)
+    # print(df['std'].mean())
