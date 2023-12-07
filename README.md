@@ -27,5 +27,6 @@ openbuddy-llama2-13b-v11.1.Q5_K_M.gguf
   * Run gpt 3.5 and 4 on 100 samples multiple times, evaluate stability
   * compare with expert
 * multi-layer community detection and compare
+  * evaluate embedding distance between agreement, neutral and disagreennt edges
 * write readme
 * DONE!
