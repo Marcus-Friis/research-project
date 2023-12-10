@@ -28,5 +28,6 @@ openbuddy-llama2-13b-v11.1.Q5_K_M.gguf
   * compare with expert
 * multi-layer community detection and compare
   * evaluate embedding distance between agreement, neutral and disagreennt edges
+  * multi-layer degree distribution
 * write readme
 * DONE!
