@@ -1,4 +1,3 @@
-import networkx as nx
 import igraph as ig
 import numpy as np
 import random
@@ -121,8 +120,16 @@ ends here
 
 def base_graph():
     # load graph
-    G_nx = nx.read_edgelist('../data/Cit-HepPh.txt', create_using=nx.DiGraph)
-    G = ig.Graph.from_networkx(G_nx)
+    with open('../data/Cit-HepPh.txt', 'r') as f:
+        for _ in range(4):
+            f.readline()
+        edges = []
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            edges.append(line.split())
+    G = ig.Graph.TupleList(edges, directed=True)
     return G
 
 def lcc():
@@ -132,7 +139,7 @@ def lcc():
 
 def lcc_excluding_no_content():
     g = lcc()
-    g.delete_vertices(g.vs.select(lambda x: x['_nx_name'] in ['9812218', '9305237']))
+    g.delete_vertices(g.vs.select(lambda x: x['name'] in ['9812218', '9305237']))
     return g
 
 def metropolis_hastings(seed=None):
