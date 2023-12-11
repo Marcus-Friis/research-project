@@ -1,4 +1,6 @@
-# Ignore .txt files
-*.txt
+# Ignore cit-hep files
+Cit-HepPh.txt
+cit-HepPh-dates.txt
+
 # Except this file
 !.gitignore
