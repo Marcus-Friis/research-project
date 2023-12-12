@@ -1,0 +1,11 @@
+number of nodes	 34399
+number of edges	 421474
+diameter	 14
+number of selfloops	 44
+number of weakly connected components	 1
+number of strongly connected components	 21461
+average clustering coefficient	 0.2960613002410944
+fraction of closed triads	 0.145659623705566
+density of graph	 0.00035619824816354614
+assortativity coefficient	 -0.006093267655448223
+modularity of graph	 0.7369776165516463
