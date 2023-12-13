@@ -15,11 +15,11 @@ sys.path.append('..')
 from src.graph_utilities import *
 
 
-ANALYSIS_LABEL = 'mhs'
-PLOT_TITLES = 'Metroplis-Hastings'
+ANALYSIS_LABEL = 'hep-ph'
+PLOT_TITLES = 'hep-ph' + '\n'
 PLOT_GRAPH = True
 SEED = 0
-G = metropolis_hastings(seed=SEED)
+G = base_graph()
 
 
 if __name__ == '__main__':
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     ax.scatter(d_in, v_in, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}\nin-degree distribution')
+    ax.set_title(f'{PLOT_TITLES}in-degree distribution')
     ax.set_xlim(-10, x_upper_bound + 10)
     ax.set_ylim(-0.01, y_upper_bound + 0.01)
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-in-degree.svg')
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     ax.scatter(d_out, v_out, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}\nout-degree distribution')
+    ax.set_title(f'{PLOT_TITLES}out-degree distribution')
     ax.set_xlim(-10, x_upper_bound + 10)
     ax.set_ylim(-0.01, y_upper_bound + 0.01)
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-out-degree.svg')
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     ax.scatter(d_in, v_in, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}\nin-degree distribution')
+    ax.set_title(f'{PLOT_TITLES}in-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     ax.scatter(d_out, v_out, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}\nout-degree distribution')
+    ax.set_title(f'{PLOT_TITLES}out-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # plot in-degree CCDF log-log
     fig, ax = plt.subplots()
     ax.plot(d_in, v_in_cum)
-    ax.set_title(f'{PLOT_TITLES}\nin-degree CCDF')
+    ax.set_title(f'{PLOT_TITLES}in-degree CCDF')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k$\geq$x)')
     ax.set_xscale('log')
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     # plot out-degree CCDF log-log
     fig, ax = plt.subplots()
     ax.plot(d_out, v_out_cum)
-    ax.set_title(f'{PLOT_TITLES}\nout-degree CCDF')
+    ax.set_title(f'{PLOT_TITLES}out-degree CCDF')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k$\geq$x)')
     ax.set_xscale('log')
