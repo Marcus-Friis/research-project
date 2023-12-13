@@ -42,16 +42,15 @@ context_dict = {
     """,
     
     'explain': """
-    You are a high energy physics expert.
-    You will get the abstract of a paper that cites another paper within the field of high energy physics.
-    You will evaluate to the best of your ability, whether the paper agrees with the other paper.
-    Paper A cites paper B.
-    The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:"
-    You will only provide single word answer, evaluating the agreement between the papers.
-    Use "agreement" when Paper A clearly agrees with or builds upon the conclusions of Paper B.
-    Use "disagreement" when Paper A clearly contradicts or refutes the conclusions of Paper B.
+    You are a high energy physics expert. 
+    You will get the abstract of a paper that cites another paper within the field of high energy physics. 
+    You will evaluate to the best of your ability, whether the paper agrees with the other paper. 
+    Paper A cites paper B. 
+    The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:" 
+    You will only provide single word answer, evaluating the agreement between the papers, followed by an explanation of your reasoning. 
+    Use "agreement" when Paper A clearly agrees with or builds upon the conclusions of Paper B. 
+    Use "disagreement" when Paper A clearly contradicts or refutes the conclusions of Paper B. 
     Use "neutral" when Paper A is neutral to the conclusions of Paper B or if it is unclear how the papers relate.
-    Explain your reasoning in a single sentences.
     """
 }
 
