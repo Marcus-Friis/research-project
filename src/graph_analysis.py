@@ -38,6 +38,7 @@ if __name__ == '__main__':
         f.write(f'average degree\t {np.mean(G.degree())}\n')
         f.write(f'median in-degree\t {np.median(G.indegree())}\n')
         f.write(f'median out-degree\t {np.median(G.outdegree())}\n')
+        f.write(f'average path length\t {G.average_path_length(directed=False)}\n')
         f.write(f'diameter\t {G.diameter(directed=False)}\n')
         f.write(f'number of selfloops\t {sum(G.is_loop())}\n')
         f.write(f'number of weakly connected components\t {len(G.components(mode="weak"))}\n')
