@@ -35,6 +35,9 @@ if __name__ == '__main__':
     with open(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-graph-properties.txt', 'w') as f:
         f.write(f'number of nodes\t {G.vcount()}\n')
         f.write(f'number of edges\t {G.ecount()}\n')
+        f.write(f'average degree\t {np.mean(G.degree())}\n')
+        f.write(f'median in-degree\t {np.median(G.indegree())}\n')
+        f.write(f'median out-degree\t {np.median(G.outdegree())}\n')
         f.write(f'diameter\t {G.diameter(directed=False)}\n')
         f.write(f'number of selfloops\t {sum(G.is_loop())}\n')
         f.write(f'number of weakly connected components\t {len(G.components(mode="weak"))}\n')
@@ -44,6 +47,7 @@ if __name__ == '__main__':
         f.write(f'density of graph\t {G.density(loops=False)}\n')
         f.write(f'assortativity coefficient\t {G.assortativity_degree(directed=False)}\n')
         f.write(f'has multiple edges\t {G.has_multiple()}\n')
+        f.write(f'is dag\t {G.is_dag()}\n')
         f.write(f'modularity of graph\t {communities.modularity}\n')
         
     # DEGREE DISTRIBUTION
