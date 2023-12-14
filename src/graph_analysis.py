@@ -42,11 +42,11 @@ if __name__ == '__main__':
         f.write(f'number of selfloops\t {sum(G.is_loop())}\n')
         f.write(f'number of weakly connected components\t {len(G.components(mode="weak"))}\n')
         f.write(f'number of strongly connected components\t {len(G.components(mode="strong"))}\n')
-        f.write(f'average clustering coefficient\t {G.transitivity_avglocal_undirected()}\n')
+        f.write(f'average clustering coefficient\t {G.transitivity_avglocal_undirected(mode="zero")}\n')
         f.write(f'fraction of closed triads\t {G.transitivity_undirected()}\n')
         f.write(f'density of graph\t {G.density(loops=False)}\n')
         f.write(f'assortativity coefficient\t {G.assortativity_degree(directed=False)}\n')
-        f.write(f'has multiple edges\t {G.has_multiple()}\n')
+        f.write(f'has multiple edges\t {G.simplify(multiple=False).has_multiple()}\n')
         f.write(f'is dag\t {G.is_dag()}\n')
         f.write(f'modularity of graph\t {communities.modularity}\n')
         
