@@ -9,10 +9,14 @@ def community_summary(community):
     print(f'modularity: {community.modularity}')
 
 if __name__ == '__main__':
-    g = lcc()
+    g = lcc_excluding_no_content()
     g_un = g.as_undirected()
     
-    community = la.find_partition(g_un, la.ModularityVertexPartition)
+    community = g_un.community_multilevel()
+    print('louvain')
+    community_summary(community)
+    
+    community = la.find_partition(g_un, la.ModularityVertexPartition, seed=42)
     print('leiden')
     community_summary(community)
     
@@ -26,10 +30,6 @@ if __name__ == '__main__':
     
     community = g_un.community_label_propagation()
     print('label propagation')
-    community_summary(community)
-        
-    community = g_un.community_leiden(resolution=0.1)
-    print('community_leiden, resolution parameter=0.1')
     community_summary(community)
 
     community = g_un.community_walktrap().as_clustering()
