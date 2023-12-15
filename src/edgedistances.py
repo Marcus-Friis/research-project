@@ -3,16 +3,16 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
 if __name__ == '__main__':
-    g, g_pos, g_neu, g_neg = multilayer_lcc()
+    _, g_pos, g_neu, g_neg = multilayer_lcc()
+    G = [g_pos, g_neu, g_neg]
     
     # compute average distance between nodes of the same label
     labels = ('agreement', 'neutral', 'disagreement')
-    for label in labels:
-        print(label)
+    for i, g in enumerate(G):
+        print(labels[i])
         distances = []
         similarities = []
-        es = g.es.select(label_eq=label)
-        for edge in es:
+        for edge in g.es:
             u = g.vs[edge.source]
             v = g.vs[edge.target]
             u_emb = np.array(u['embedding']).reshape(-1, 1)
