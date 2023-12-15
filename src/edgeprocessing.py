@@ -5,11 +5,11 @@ from natsort import natsorted
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-p', '--plot', default=False, help='Plot plots')
-    parser.add_argument('-d', '--dump', default=True, help='Dump to file')
+    parser.add_argument('-p', '--no-plot', action='store_false', help='dont plot')
+    parser.add_argument('-d', '--no-dump', action='store_false', help='Dont dump to file')
     args = parser.parse_args()
-    PLOT = bool(args.plot)
-    DUMP = bool(args.dump)
+    PLOT = args.plot
+    DUMP = args.dump
     
     # get all edge files
     path = '../data/edges/'
