@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from natsort import natsorted
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -13,6 +14,7 @@ if __name__ == '__main__':
     # get all edge files
     path = '../data/edges/'
     files = [file for file in os.listdir(path) if 'edges_' in file]
+    files = natsorted(files)
 
     # read all edges
     edges = []
@@ -56,11 +58,13 @@ if __name__ == '__main__':
     assert (agree_check & none_check).sum() == 0
     
     if DUMP:
+        print('Dumping to file...')
         # dump to file
         edges[:, 2] = edges_clean
         np.savetxt('../data/edges.txt', edges, fmt='%s')
 
     if PLOT:
+        print('Plotting...')
         import matplotlib.pyplot as plt
         plt.style.use('ggplot')
         
