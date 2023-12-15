@@ -4,36 +4,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
-from graph_utilities import lcc_aug, lcc_aug_embedding
+from graph_utilities import multilayer_lcc
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import silhouette_score
 
 
 if __name__ == '__main__':
     labels = ['agreement', 'neutral', 'disagreement']
-    g = lcc_aug_embedding()
-    # g = lcc_aug()
-    # g.vs['embedding'] = np.random.rand(g.vcount(), 10)
+    g, g_pos, g_neu, g_neg = multilayer_lcc(load_embeds=False)
     
-    # compute average distance between nodes of the same label
-    for label in labels:
-        print(label)
-        distances = []
-        es = g.es.select(label_eq=label)
-        for edge in es:
-            u = g.vs[edge.source]
-            v = g.vs[edge.target]
+    # # compute average distance between nodes of the same label
+    # for label in labels:
+    #     print(label)
+    #     distances = []
+    #     es = g.es.select(label_eq=label)
+    #     for edge in es:
+    #         u = g.vs[edge.source]
+    #         v = g.vs[edge.target]
             
-            emb_u = u['embedding'].reshape(-1, 1)
-            emb_v = v['embedding'].reshape(-1, 1)
+    #         emb_u = u['embedding'].reshape(-1, 1)
+    #         emb_v = v['embedding'].reshape(-1, 1)
             
-            similarity = cosine_similarity(emb_u, emb_v)
-            distances.append(similarity)
-        print(np.mean(distances))
-        
-    g.es.select(label_eq='agreement')['color'] = 'green'
-    g.es.select(label_eq='neutral')['color'] = 'gray'
-    g.es.select(label_eq='disagreement')['color'] = 'red'
+    #         similarity = cosine_similarity(emb_u, emb_v)
+    #         distances.append(similarity)
+    #     print(np.mean(distances))
 
 
     def get_degree_sequence(label):
@@ -62,34 +56,35 @@ if __name__ == '__main__':
     dot_size = 15
 
     # plot in-degree
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.scatter(a_d_in, a_v_in, s=dot_size, color='tab:green', label='agreement', alpha=0.7, marker='^')
-    ax.scatter(n_d_in, n_v_in, s=dot_size, color='tab:gray', label='neutral', alpha=0.7, marker='s')
-    ax.scatter(d_d_in, d_v_in, s=dot_size, color='tab:red', label='disagreement', alpha=0.7, marker='o')
+    ax.scatter(n_d_in, n_v_in, s=dot_size, color='tab:blue', label='neutral', alpha=0.7, marker='s')
+    ax.scatter(d_d_in, d_v_in, s=dot_size, color='tab:orange', label='disagreement', alpha=0.7, marker='o')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'in-degree distribution')
+    # ax.set_title(f'LCC multilayer\nin-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.set_xlim(0.9, max(np.max(a_d_in), np.max(n_d_in), np.max(d_d_in), np.max(a_d_out), np.max(n_d_out), np.max(d_d_out))*2)
+    ax.set_ylim(0.00001, max(np.max(a_v_in), np.max(n_v_in), np.max(d_v_in), np.max(a_v_out), np.max(n_v_out), np.max(d_v_out))*2)
     ax.legend()
+    plt.tight_layout()
     fig.savefig(f'../figs/mlg-in-degree.svg')
 
     # plot out-degree
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.scatter(a_d_out, a_v_out, s=dot_size, color='tab:green', label='agreement', alpha=0.7, marker='^')
-    ax.scatter(n_d_out, n_v_out, s=dot_size, color='tab:gray', label='neutral', alpha=0.7, marker='s')
-    ax.scatter(d_d_out, d_v_out, s=dot_size, color='tab:red', label='disagreement', alpha=0.7, marker='o')
+    ax.scatter(n_d_out, n_v_out, s=dot_size, color='tab:blue', label='neutral', alpha=0.7, marker='s')
+    ax.scatter(d_d_out, d_v_out, s=dot_size, color='tab:orange', label='disagreement', alpha=0.7, marker='o')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'out-degree distribution')
+    # ax.set_title(f'LCC multilayer\nout-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.set_xlim(0.9, max(np.max(a_d_in), np.max(n_d_in), np.max(d_d_in), np.max(a_d_out), np.max(n_d_out), np.max(d_d_out))*2)
+    ax.set_ylim(0.00001, max(np.max(a_v_in), np.max(n_v_in), np.max(d_v_in), np.max(a_v_out), np.max(n_v_out), np.max(d_v_out))*2)
+    plt.tight_layout()
     fig.savefig(f'../figs/mlg-out-degree.svg')
-    
-    # multilayer community detection
-    g_pos = g.subgraph_edges(g.es.select(label_eq='agreement'), delete_vertices=False)
-    g_neu = g.subgraph_edges(g.es.select(label_eq='neutral'), delete_vertices=False)
-    g_neg = g.subgraph_edges(g.es.select(label_eq='disagreement'), delete_vertices=False)
     
     membership, improv = la.find_partition_multiplex(
         [g_pos, g_neu, g_neg],
