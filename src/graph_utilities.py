@@ -1,4 +1,5 @@
 import igraph as ig
+import json
 
 
 def base_graph():
@@ -46,4 +47,10 @@ def lcc_aug():
     g = g.components(mode='weak').giant()
     return g
 
-
+def lcc_aug_embedding():
+    g = lcc_aug()
+    
+    with open('../data/embeds.json', 'r') as f:
+        embeddings = json.load(f)
+    g.vs['embedding'] = [embeddings[str(node)] for node in g.vs['name']]
+    return g
