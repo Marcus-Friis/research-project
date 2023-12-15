@@ -38,7 +38,6 @@ def aug_graph():
     edges = [(edge[0], edge[1], edge[2].lower()) for edge in edges]
 
     g = ig.Graph.TupleList(edges, directed=True, edge_attrs=['label'])
-    g = g.components(mode='weak').giant()
     g.delete_vertices(g.vs.select(lambda x: x['name'] in ['9812218', '9305237']))
     return g
 
