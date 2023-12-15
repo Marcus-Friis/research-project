@@ -15,6 +15,7 @@ context_dict = {
     Paper A cites paper B.
     The abstract of paper A will follow after "Paper A:", and the abstract of paper B will follow after "Paper B:"
     You will only provide single word answer, evaluating the agreement between the papers.    
+    Use one of these labels: "agreement", "disagreement", "neutral".
     """,
     
     'medium': """
