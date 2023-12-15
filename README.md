@@ -17,6 +17,7 @@ Embeddings are created using [embedder.py](src/embedder.py), which iterate throu
 ```
 from llama_cpp import Llama
 llama_kwargs = {
+    model_path: 'YOUR_MODEL_PATH'
     embedding: True,
     ...
 }
