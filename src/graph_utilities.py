@@ -27,7 +27,7 @@ def lcc_excluding_no_content():
     return g
 
 def aug_graph():
-    with open('../data/edges.txt', 'r') as f:
+    with open('../data/Cit-HEP-PH-Aug.txt', 'r') as f:
         edges = []
         while True:
             line = f.readline()

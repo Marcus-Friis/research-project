@@ -61,7 +61,7 @@ if __name__ == '__main__':
         print('Dumping to file...')
         # dump to file
         edges[:, 2] = edges_clean
-        np.savetxt('../data/edges.txt', edges, fmt='%s')
+        np.savetxt('../data/Cit-HEP-PH-Aug.txt', edges, fmt='%s')
 
     if PLOT:
         print('Plotting...')
