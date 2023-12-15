@@ -46,20 +46,4 @@ def lcc_aug():
     g = g.components(mode='weak').giant()
     return g
 
-def metropolis_hastings(seed=None):
-    G = lcc_excluding_no_content()
-    subgraph_nodes = metropolis_hastings_sampling(G, subgraph_size=G.vcount() // 10, seed=seed)
-    G = G.subgraph(subgraph_nodes)
-    return G
 
-def forest_fire():
-    G = lcc_excluding_no_content(seed=None)
-    subgraph_nodes = forest_fire_sampling(G, subgraph_size=G.vcount() // 10)
-    G = G.subgraph(subgraph_nodes)
-    return G
-
-def random_walk(seed=None):
-    G = lcc_excluding_no_content(seed=None)
-    subgraph_nodes = random_walk_sampling(G, subgraph_size=G.vcount() // 10, seed=seed)
-    G = G.subgraph(subgraph_nodes)
-    return G
