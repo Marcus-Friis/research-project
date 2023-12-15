@@ -1,18 +1,19 @@
 import igraph as ig
 import leidenalg as la
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import random
+plt.style.use('ggplot')
 
-from graph_utilities import lcc_excluding_no_content
+from graph_utilities import lcc_aug, lcc_aug_embedding
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import silhouette_score
 
 
 if __name__ == '__main__':
     labels = ['agreement', 'neutral', 'disagreement']
-    g = lcc_excluding_no_content()
-    g.vs['embedding'] = np.random.rand(g.vcount(), 10)
-    g.es['label'] = np.random.choice(labels, g.ecount())
+    g = lcc_aug_embedding()
+    # g = lcc_aug()
+    # g.vs['embedding'] = np.random.rand(g.vcount(), 10)
     
     # compute average distance between nodes of the same label
     for label in labels:
@@ -22,55 +23,70 @@ if __name__ == '__main__':
         for edge in es:
             u = g.vs[edge.source]
             v = g.vs[edge.target]
-            distances.append(np.linalg.norm(u['embedding'] - v['embedding']))
+            
+            emb_u = u['embedding'].reshape(-1, 1)
+            emb_v = v['embedding'].reshape(-1, 1)
+            
+            similarity = cosine_similarity(emb_u, emb_v)
+            distances.append(similarity)
         print(np.mean(distances))
         
     g.es.select(label_eq='agreement')['color'] = 'green'
     g.es.select(label_eq='neutral')['color'] = 'gray'
     g.es.select(label_eq='disagreement')['color'] = 'red'
-    
+
+
     def get_degree_sequence(label):
-        _, in_degrees = np.unique([edge.source for edge in g.es.select(label_eq=label)], return_counts=True)
-        _, out_degrees = np.unique([edge.target for edge in g.es.select(label_eq=label)], return_counts=True)
+        _, in_degrees = np.unique([edge.target for edge in g.es.select(label_eq=label)], return_counts=True)
+        _, out_degrees = np.unique([edge.source for edge in g.es.select(label_eq=label)], return_counts=True)
         
         d_in, v_in = np.unique(in_degrees, return_counts=True)
-        v_in = v_in / v_in.sum()
         d_out, v_out = np.unique(out_degrees, return_counts=True)
-        v_out = v_out / v_out.sum()
         
         return d_in, v_in, d_out, v_out
 
     a_d_in, a_v_in, a_d_out, a_v_out = get_degree_sequence('agreement')
     n_d_in, n_v_in, n_d_out, n_v_out = get_degree_sequence('neutral')
     d_d_in, d_v_in, d_d_out, d_v_out = get_degree_sequence('disagreement')
+
+    # normalize
+    in_total = np.sum(a_v_in) + np.sum(n_v_in) + np.sum(d_v_in)
+    out_total = np.sum(a_v_out) + np.sum(n_v_out) + np.sum(d_v_out)
+    a_v_in = a_v_in / in_total
+    n_v_in = n_v_in / in_total
+    d_v_in = d_v_in / in_total
+    a_v_out = a_v_out / out_total
+    n_v_out = n_v_out / out_total
+    d_v_out = d_v_out / out_total
     
     dot_size = 15
 
-    # fig, (ax1, ax2) = plt.subplots(2)
+    # plot in-degree
+    fig, ax = plt.subplots()
+    ax.scatter(a_d_in, a_v_in, s=dot_size, color='tab:green', label='agreement', alpha=0.7, marker='^')
+    ax.scatter(n_d_in, n_v_in, s=dot_size, color='tab:gray', label='neutral', alpha=0.7, marker='s')
+    ax.scatter(d_d_in, d_v_in, s=dot_size, color='tab:red', label='disagreement', alpha=0.7, marker='o')
+    ax.set_xlabel('k')
+    ax.set_ylabel('p(k)')
+    ax.set_title(f'in-degree distribution')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.legend()
+    fig.savefig(f'../figs/mlg-in-degree.svg')
 
-    # # plot in-degree
-    # ax1.scatter(a_d_in, a_v_in, s=dot_size, color='green', label='agreement', alpha=0.5, marker='^')
-    # ax1.scatter(n_d_in, n_v_in, s=dot_size, color='gray', label='neutral', alpha=0.5, marker='s')
-    # ax1.scatter(d_d_in, d_v_in, s=dot_size, color='red', label='disagreement', alpha=0.5, marker='o')
-    # ax1.set_xlabel('k')
-    # ax1.set_ylabel('p(k)')
-    # ax1.set_title(f'in-degree distribution')
-    # ax1.set_xscale('log')
-    # ax1.set_yscale('log')
-    # ax1.legend()
-
-    # # plot out-degree
-    # ax2.scatter(a_d_out, a_v_out, s=dot_size, color='green', label='agreement', alpha=0.5, marker='^')
-    # ax2.scatter(n_d_out, n_v_out, s=dot_size, color='gray', label='neutral', alpha=0.5, marker='s')
-    # ax2.scatter(d_d_out, d_v_out, s=dot_size, color='red', label='disagreement', alpha=0.5, marker='o')
-    # ax2.set_xlabel('k')
-    # ax2.set_ylabel('p(k)')
-    # ax2.set_title(f'out-degree distribution')
-    # ax2.set_xscale('log')
-    # ax2.set_yscale('log')
-
-    # plt.tight_layout()
+    # plot out-degree
+    fig, ax = plt.subplots()
+    ax.scatter(a_d_out, a_v_out, s=dot_size, color='tab:green', label='agreement', alpha=0.7, marker='^')
+    ax.scatter(n_d_out, n_v_out, s=dot_size, color='tab:gray', label='neutral', alpha=0.7, marker='s')
+    ax.scatter(d_d_out, d_v_out, s=dot_size, color='tab:red', label='disagreement', alpha=0.7, marker='o')
+    ax.set_xlabel('k')
+    ax.set_ylabel('p(k)')
+    ax.set_title(f'out-degree distribution')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    fig.savefig(f'../figs/mlg-out-degree.svg')
     
+    # multilayer community detection
     g_pos = g.subgraph_edges(g.es.select(label_eq='agreement'), delete_vertices=False)
     g_neu = g.subgraph_edges(g.es.select(label_eq='neutral'), delete_vertices=False)
     g_neg = g.subgraph_edges(g.es.select(label_eq='disagreement'), delete_vertices=False)
@@ -81,14 +97,9 @@ if __name__ == '__main__':
         layer_weights=[1, .5, -1],
         seed=42)
     
-    # TODO: evaluate?
+    print('Full graph\t', g.modularity(membership))
+    print('Positive  \t', g_pos.modularity(membership))
+    print('Neutral   \t', g_neu.modularity(membership))
+    print('Negative  \t', g_neg.modularity(membership))
     
-    # target = 'test.svg'
-    # layout = g.layout("fr")
-    # ig.plot(g_pos, layout=layout, vertex_size=0, vertex_label=None, edge_label=None, vertex_frame_width=0, 
-    #         edge_arrow_size=0.02, edge_width=0.02, target='pos'+target)
-    # ig.plot(g_neu, layout=layout, vertex_size=0, vertex_label=None, edge_label=None, vertex_frame_width=0, 
-    #         edge_arrow_size=0.02, edge_width=0.02, target='neu'+target)
-    # ig.plot(g_neg, layout=layout, vertex_size=0, vertex_label=None, edge_label=None, vertex_frame_width=0, 
-    #         edge_arrow_size=0.02, edge_width=0.02, target='neg'+target)
-    
+    print('Silhouette score\t', silhouette_score(g.vs['embedding'], membership, metric='cosine'))
