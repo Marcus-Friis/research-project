@@ -2,6 +2,14 @@ import os
 import numpy as np
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-p', '--plot', default=False, help='Plot plots')
+    parser.add_argument('-d', '--dump', default=True, help='Dump to file')
+    args = parser.parse_args()
+    PLOT = bool(args.plot)
+    DUMP = bool(args.dump)
+    
     # get all edge files
     path = '../data/edges/'
     files = [file for file in os.listdir(path) if 'edges_' in file]
@@ -47,6 +55,28 @@ if __name__ == '__main__':
     assert (neutral_check & none_check).sum() == 0
     assert (agree_check & none_check).sum() == 0
     
-    # dump to file
-    edges[:, 2] = edges_clean
-    np.savetxt('../data/edges.txt', edges, fmt='%s')
+    if DUMP:
+        # dump to file
+        edges[:, 2] = edges_clean
+        np.savetxt('../data/edges.txt', edges, fmt='%s')
+
+    if PLOT:
+        import matplotlib.pyplot as plt
+        plt.style.use('ggplot')
+        
+        # plot label distribution
+        x, y = np.unique(edges_clean, return_counts=True)
+        idx = np.argsort(y)[::-1]
+        x = x[idx]
+        y = y[idx]
+
+        fig, ax = plt.subplots()
+        ax.bar(x, y)
+        ax.set_title('Cit-HEP-PH-Aug\nEdge label distribution')
+        ax.set_ylabel('Count')
+        ax.set_xlabel('Label')
+        for i, v in enumerate(y):
+            ax.text(i, v+1000, str(v), fontweight='semibold', ha='center')
+        
+        plt.tight_layout()
+        fig.savefig('../figs/label_distribution.svg')
