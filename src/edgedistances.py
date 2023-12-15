@@ -6,7 +6,7 @@ if __name__ == '__main__':
     from collections import defaultdict
     data = defaultdict(int)
     
-    g = lcc_aug_embedding(load_embeds=False)
+    g = lcc_aug_embedding()
     for edge in g.es:
         label = edge['label']
         u = g.vs[edge.source]
