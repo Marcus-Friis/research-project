@@ -1,4 +1,5 @@
 import igraph as ig
+import numpy as np
 import json
 
 
@@ -46,10 +47,20 @@ def lcc_aug():
     g = g.components(mode='weak').giant()
     return g
 
-def lcc_aug_embedding():
+def lcc_aug_embedding(load_embeds=True):
     g = lcc_aug()
     
-    with open('../data/embeds.json', 'r') as f:
-        embeddings = json.load(f)
-    g.vs['embedding'] = [embeddings[str(node)] for node in g.vs['name']]
+    if load_embeds:
+        with open('../data/embeds.json', 'r') as f:
+            embeddings = json.load(f)
+        g.vs['embedding'] = [embeddings[str(node)] for node in g.vs['name']]
+    else:
+        g.vs['embedding'] = np.random.rand(g.vcount(), 10)
     return g
+
+def multilayer_lcc(load_embeds=True):
+    g = lcc_aug_embedding(load_embeds=load_embeds)
+    g_pos = g.subgraph_edges(g.es.select(label_eq='agreement'), delete_vertices=False)
+    g_neu = g.subgraph_edges(g.es.select(label_eq='neutral'), delete_vertices=False)
+    g_neg = g.subgraph_edges(g.es.select(label_eq='disagreement'), delete_vertices=False)
+    return g, g_pos, g_neu, g_neg
