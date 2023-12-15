@@ -8,8 +8,8 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--no-plot', action='store_false', help='dont plot')
     parser.add_argument('-d', '--no-dump', action='store_false', help='Dont dump to file')
     args = parser.parse_args()
-    PLOT = args.plot
-    DUMP = args.dump
+    PLOT = args.no_plot
+    DUMP = args.no_dump
     
     # get all edge files
     path = '../data/edges/'
@@ -75,10 +75,10 @@ if __name__ == '__main__':
         y = y[idx]
 
         fig, ax = plt.subplots()
-        ax.bar(x, y)
+        ax.bar(x, y, color=['tab:orange', 'tab:green', 'tab:blue', 'tab:grey'])
         ax.set_title('Cit-HEP-PH-Aug\nEdge label distribution')
         ax.set_ylabel('Count')
-        ax.set_xlabel('Label')
+        ax.set_xlabel('Edge label')
         for i, v in enumerate(y):
             ax.text(i, v+1000, str(v), fontweight='semibold', ha='center')
         
