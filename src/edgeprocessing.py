@@ -79,8 +79,9 @@ if __name__ == '__main__':
         ax.set_title('Cit-HEP-PH-Aug\nEdge label distribution')
         ax.set_ylabel('Count')
         ax.set_xlabel('Edge label')
+        ax.set_ylim(0, y.max() * 1.1)
         for i, v in enumerate(y):
-            ax.text(i, v+1000, str(v), fontweight='semibold', ha='center')
+            ax.text(i, v+5000, str(v), fontweight='semibold', ha='center')
         
         plt.tight_layout()
         fig.savefig('../figs/label_distribution.svg')
