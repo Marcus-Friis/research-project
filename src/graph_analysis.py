@@ -15,10 +15,10 @@ sys.path.append('..')
 from src.graph_utilities import *
 
 
-ANALYSIS_LABEL = 'hep-ph'
-PLOT_TITLES = 'hep-ph' + '\n'
+ANALYSIS_LABEL = 'no_title_hep-ph'
+PLOT_TITLES = ''  # 'lcc' + '\n'
 PLOT_GRAPH = True
-SEED = 0
+SEED = 42
 G = base_graph()
 
 
@@ -68,49 +68,53 @@ if __name__ == '__main__':
     dot_size = 15
 
     # plot in-degree
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.scatter(d_in, v_in, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}in-degree distribution')
+    # ax.set_title(f'{PLOT_TITLES}in-degree distribution')
     ax.set_xlim(-10, x_upper_bound + 10)
     ax.set_ylim(-0.01, y_upper_bound + 0.01)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-in-degree.svg')
 
     # plot out-degree
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.scatter(d_out, v_out, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}out-degree distribution')
+    # ax.set_title(f'{PLOT_TITLES}out-degree distribution')
     ax.set_xlim(-10, x_upper_bound + 10)
     ax.set_ylim(-0.01, y_upper_bound + 0.01)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-out-degree.svg')
 
     # plot in-degree log-log
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.scatter(d_in, v_in, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}in-degree distribution')
+    # ax.set_title(f'{PLOT_TITLES}in-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
     ax.set_ylim(0.0001, y_upper_bound*2)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-log-in-degree.svg')
 
     # plot out-degree log-log
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     d_out, v_out = np.unique(out_degrees, return_counts=True)
     v_out = v_out / v_out.sum()
     ax.scatter(d_out, v_out, s=dot_size)
     ax.set_xlabel('k')
     ax.set_ylabel('p(k)')
-    ax.set_title(f'{PLOT_TITLES}out-degree distribution')
+    # ax.set_title(f'{PLOT_TITLES}out-degree distribution')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
     ax.set_ylim(0.0001, y_upper_bound*2)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-log-out-degree.svg')
 
     # get complementray cumulative sum of degrees
@@ -119,32 +123,35 @@ if __name__ == '__main__':
     y_axis_lower_bound = min(np.min(v_in_cum), np.min(v_out_cum))
 
     # plot in-degree CCDF log-log
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.plot(d_in, v_in_cum)
-    ax.set_title(f'{PLOT_TITLES}in-degree CCDF')
+    # ax.set_title(f'{PLOT_TITLES}in-degree CCDF')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k$\geq$x)')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
     ax.set_ylim(y_axis_lower_bound*2, 1.1)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-in-degree-ccdf.svg')
 
     # plot out-degree CCDF log-log
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[6.4*0.75, 4.8*0.75])
     ax.plot(d_out, v_out_cum)
-    ax.set_title(f'{PLOT_TITLES}out-degree CCDF')
+    # ax.set_title(f'{PLOT_TITLES}out-degree CCDF')
     ax.set_xlabel('k')
     ax.set_ylabel('p(k$\geq$x)')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim(0.9, x_upper_bound*2)
     ax.set_ylim(y_axis_lower_bound*2, 1.1)
+    plt.tight_layout()
     fig.savefig(f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-out-degree-ccdf.svg')
 
     # visualize graph
     if PLOT_GRAPH:
         target = f'../figs/{ANALYSIS_LABEL}/{ANALYSIS_LABEL}-graph.svg'
+        G = G.as_undirected()
         layout = G.layout("fr")
         ig.plot(communities, layout=layout, vertex_size=2, vertex_label=None, vertex_frame_width=0, 
-                edge_arrow_size=0.02, edge_width=0.02, target=target)
+                edge_arrow_size=0, edge_width=0.02, target=target)
