@@ -3,8 +3,6 @@
 
 By Mads Høgenhaug, Marcus Friis, Morten Pedersen.
 
-<img src="figs/mlg-in-degree.svg" width="500">
-
 This repo contains all code and data used for producing the accompanying paper. The created *Cit-Hep-Ph-Aug* dataset can be found in:
 * [Edge list with labels](data/Cit-HEP-PH-Aug.txt)
 * [Abstract embeddings](<https://www.mediafire.com/file/im0jf93tdihemrg/combined_data.rar/file>)
