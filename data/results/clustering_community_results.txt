@@ -1,0 +1,99 @@
+Running on desktop21:
+running python script
+loading graph
+detecting communities
+	Modularity 0.7330507023622189
+		Agreement 0.7723140959114979
+		Neutral 0.6752775608063386
+		Disagreement 0.7172403692833591
+	Silhouette -0.08487108069680652
+detecting multi-layer communities
+	Improvement 0.6674679351888199
+	Modularity 0.3259576183163892
+		Agreement 0.5195606583206431
+		Neutral 0.6624584488285732
+		Disagreement 0.1830357799338849
+	Silhouette -0.2985783599076625
+comparing to multi-layer community
+	NMI: 0.3452150370185078
+	AMI: 0.29700835007446835
+	ARI: 0.11865864037910068
+reducing dimensionality
+plotting community
+plotting multi-layer community
+clustering k=5
+	Modularity 0.02234956855345045
+		Agreement 0.029754555447659838
+		Neutral 0.02243671194105526
+		Disagreement 0.017731632510533012
+	Silhouette 0.04017070214995149
+	comparing to community
+		NMI: 0.006137797867686571
+		AMI: 0.005504768229326099
+		ARI: 0.0029154789006620796
+	comparing to multi-layer community
+		NMI: 0.049118252537055485
+		AMI: 0.004207768319839843
+		ARI: 0.0005810410729206714
+	plotting clustering
+clustering k=10
+	Modularity 0.03378881038208577
+		Agreement 0.040534726764785485
+		Neutral 0.029422093892291654
+		Disagreement 0.029936535971300804
+	Silhouette 0.02345437020468953
+	comparing to community
+		NMI: 0.021785540739333663
+		AMI: 0.020580604900063162
+		ARI: 0.010027961600153798
+	comparing to multi-layer community
+		NMI: 0.07052139213033046
+		AMI: 0.012190366102102607
+		ARI: 0.002547827833718974
+	plotting clustering
+clustering k=20
+	Modularity 0.02846577641364201
+		Agreement 0.03570571882686732
+		Neutral 0.023986889035170832
+		Disagreement 0.024522833139774228
+	Silhouette 0.020608524524658785
+	comparing to community
+		NMI: 0.03034036763344557
+		AMI: 0.028176669703240755
+		ARI: 0.011854473342330623
+	comparing to multi-layer community
+		NMI: 0.09088914151947403
+		AMI: 0.018838586808012994
+		ARI: 0.004328024755234967
+	plotting clustering
+clustering k=50
+	Modularity 0.01782359794819145
+		Agreement 0.02281938784746984
+		Neutral 0.015071289046581338
+		Disagreement 0.01514843548373819
+	Silhouette 0.012782190114829986
+	comparing to community
+		NMI: 0.03673661812993343
+		AMI: 0.03224178369442395
+		ARI: 0.008001720944048059
+	comparing to multi-layer community
+		NMI: 0.11149713353773963
+		AMI: 0.020784099065748907
+		ARI: 0.0041625509542438524
+	plotting clustering
+clustering k=100
+	Modularity 0.013478808663160608
+		Agreement 0.01676915070256452
+		Neutral 0.011393067326879608
+		Disagreement 0.011768727547936316
+	Silhouette 0.009735777799500462
+	comparing to community
+		NMI: 0.04958289873314479
+		AMI: 0.041884209284689784
+		ARI: 0.005994624974517851
+	comparing to multi-layer community
+		NMI: 0.13573260539408805
+		AMI: 0.02847970967816685
+		ARI: 0.003994726384360486
+	plotting clustering
+saving
